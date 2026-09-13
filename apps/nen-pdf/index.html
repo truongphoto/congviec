@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Nén PDF trực tiếp trên trình duyệt, không tải file lên máy chủ." />
+  <title>PDF Compressor V7 - Nén nhanh, tiết kiệm RAM</title>
+
+  <!-- pdf-lib: dùng để tạo lại file PDF đầu ra -->
+  <script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #667085;
+      --line: #e5e9f2;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --primary-soft: #eff6ff;
+      --success: #15803d;
+      --success-bg: #f0fdf4;
+      --danger: #b42318;
+      --danger-bg: #fff1f0;
+      --shadow: 0 18px 50px rgba(17, 24, 39, 0.08);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+    }
+
+    button, input { font: inherit; }
+
+    .page {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+    }
+
+    .app {
+      width: min(760px, 100%);
+      background: var(--card);
+      border: 1px solid rgba(229, 233, 242, 0.9);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: clamp(22px, 4vw, 38px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 10px;
+    }
+
+    .brand-icon {
+      width: 46px;
+      height: 46px;
+      flex: 0 0 46px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #2563eb, #0ea5e9);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24);
+    }
+
+    h1 {
+      font-size: clamp(1.5rem, 4vw, 2.15rem);
+      line-height: 1.15;
+      margin: 0;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0 0 26px;
+      line-height: 1.65;
+    }
+
+    .privacy {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      color: #166534;
+      background: #f0fdf4;
+      font-size: 0.86rem;
+      font-weight: 650;
+    }
+
+    .dropzone {
+      position: relative;
+      border: 2px dashed #cbd5e1;
+      border-radius: 18px;
+      background: #fbfcfe;
+      padding: clamp(26px, 7vw, 42px) 22px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s ease, background .2s ease, transform .2s ease, box-shadow .2s ease;
+      outline: none;
+    }
+
+    .dropzone:hover,
+    .dropzone:focus-visible,
+    .dropzone.dragover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(37, 99, 235, 0.08);
+    }
+
+    .dropzone svg {
+      width: 44px;
+      height: 44px;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .drop-title {
+      font-weight: 750;
+      margin-bottom: 6px;
+    }
+
+    .drop-help {
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.55;
+    }
+
+    .choose-btn {
+      margin-top: 15px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 750;
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, .18);
+    }
+
+    .choose-btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+
+    #fileInput { display: none; }
+
+    .file-card,
+    .settings,
+    .status-box {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 16px;
+      background: #fff;
+    }
+
+    .file-card {
+      display: none;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .file-card.show { display: grid; }
+
+    .pdf-badge {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: #fff1f2;
+      color: #be123c;
+      font-weight: 800;
+      font-size: 0.8rem;
+    }
+
+    .file-name {
+      font-weight: 750;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .file-size {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .remove-btn {
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 9px;
+      transition: background .18s ease, color .18s ease;
+    }
+
+    .remove-btn:hover { background: #f2f4f7; color: var(--danger); }
+
+    .settings { display: none; }
+    .settings.show { display: block; }
+
+    .setting-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .setting-title { font-weight: 800; }
+
+    .level-pill {
+      min-width: 64px;
+      text-align: center;
+      background: var(--primary-soft);
+      color: var(--primary);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-weight: 800;
+    }
+
+    .range-wrap { position: relative; }
+
+    input[type="range"] {
+      width: 100%;
+      appearance: none;
+      height: 8px;
+      border-radius: 999px;
+      outline: none;
+      cursor: pointer;
+      background: linear-gradient(to right, var(--primary) 0%, var(--primary) 50%, #dbe2ee 50%, #dbe2ee 100%);
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      border: 6px solid var(--primary);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, .18);
+      transition: transform .15s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.08); }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      border: 6px solid var(--primary);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, .18);
+    }
+
+    .range-labels {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      margin-top: 8px;
+      font-size: .82rem;
+    }
+
+    .ultra-card {
+      margin-top: 18px;
+      border: 1px solid #dbeafe;
+      border-radius: 15px;
+      background: linear-gradient(180deg, #f8fbff, #ffffff);
+      padding: 14px;
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+    }
+
+    .ultra-card.active {
+      border-color: #93c5fd;
+      background: #f0f7ff;
+      box-shadow: 0 8px 22px rgba(37, 99, 235, .08);
+    }
+
+    .ultra-toggle {
+      display: flex;
+      align-items: flex-start;
+      gap: 11px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .ultra-toggle input[type="checkbox"] {
+      width: 19px;
+      height: 19px;
+      margin: 2px 0 0;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex: 0 0 19px;
+    }
+
+    .ultra-title {
+      font-weight: 850;
+      line-height: 1.25;
+    }
+
+    .ultra-desc {
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: .84rem;
+      line-height: 1.5;
+    }
+
+    .ultra-controls {
+      display: none;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #dbeafe;
+    }
+
+    .ultra-controls.show { display: block; }
+
+    .ultra-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .ultra-value {
+      min-width: 46px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      text-align: center;
+      font-weight: 900;
+      color: #1d4ed8;
+      background: #dbeafe;
+    }
+
+    .ultra-warning {
+      margin-top: 10px;
+      color: #92400e;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 11px;
+      padding: 9px 10px;
+      font-size: .8rem;
+      line-height: 1.45;
+    }
+
+    .estimate-grid {
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .metric {
+      border-radius: 14px;
+      background: #f8fafc;
+      padding: 14px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: .85rem;
+      margin-bottom: 5px;
+    }
+
+    .metric-value {
+      font-weight: 850;
+      font-size: 1.14rem;
+      letter-spacing: -0.02em;
+    }
+
+    .metric-value.green { color: var(--success); }
+
+    .compress-btn {
+      width: 100%;
+      min-height: 52px;
+      margin-top: 18px;
+      border: 0;
+      border-radius: 14px;
+      color: #fff;
+      background: linear-gradient(135deg, #2563eb, #0ea5e9);
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+      box-shadow: 0 12px 26px rgba(37, 99, 235, .22);
+    }
+
+    .compress-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(37, 99, 235, .26); }
+    .compress-btn:disabled { cursor: not-allowed; opacity: .55; box-shadow: none; }
+
+    .status-box {
+      display: none;
+      line-height: 1.55;
+    }
+
+    .status-box.show { display: block; }
+    .status-box.success { background: var(--success-bg); border-color: #bbf7d0; color: #166534; }
+    .status-box.error { background: var(--danger-bg); border-color: #fecaca; color: var(--danger); }
+
+    .loading-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 750;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 3px solid #dbeafe;
+      border-top-color: var(--primary);
+      animation: spin .8s linear infinite;
+      flex: 0 0 20px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .progress {
+      width: 100%;
+      height: 9px;
+      margin-top: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: #e8eef8;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #2563eb, #0ea5e9);
+      transition: width .2s ease;
+    }
+
+    .status-detail {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .82rem;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    .note strong { color: #475467; }
+
+    @media (max-width: 560px) {
+      .page { padding: 12px; }
+      .app { border-radius: 18px; padding: 20px 16px; }
+      .brand { align-items: flex-start; }
+      .file-card { grid-template-columns: 42px minmax(0, 1fr) auto; }
+      .estimate-grid { grid-template-columns: 1fr; }
+      .dropzone { padding: 28px 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation-duration: 0.001ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="app" aria-labelledby="appTitle">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 3v12"></path>
+            <path d="m7 10 5 5 5-5"></path>
+            <path d="M5 21h14"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 id="appTitle">Nén PDF trực tiếp trên trình duyệt</h1>
+          <div class="privacy">🔒 File không được tải lên máy chủ</div>
+        </div>
+      </div>
+
+      <p class="subtitle">
+        Chọn một file PDF, điều chỉnh mức nén và tải xuống bản tối ưu. Toàn bộ nội dung PDF được xử lý ngay trên thiết bị của bạn.
+      </p>
+
+      <div id="dropzone" class="dropzone" tabindex="0" role="button" aria-label="Chọn hoặc kéo thả file PDF">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 16V4"></path>
+          <path d="m7 9 5-5 5 5"></path>
+          <path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"></path>
+        </svg>
+        <div class="drop-title">Kéo & thả file PDF vào đây</div>
+        <div class="drop-help">hoặc bấm nút bên dưới để chọn file từ máy tính / điện thoại</div>
+        <button id="chooseBtn" class="choose-btn" type="button">Chọn file PDF</button>
+        <input id="fileInput" type="file" accept="application/pdf,.pdf" />
+      </div>
+
+      <div id="fileCard" class="file-card" aria-live="polite">
+        <div class="pdf-badge">PDF</div>
+        <div>
+          <div id="fileName" class="file-name">—</div>
+          <div id="fileSize" class="file-size">—</div>
+        </div>
+        <button id="removeBtn" class="remove-btn" type="button" title="Bỏ file" aria-label="Bỏ file đã chọn">✕</button>
+      </div>
+
+      <div id="settings" class="settings">
+        <div class="setting-head">
+          <div class="setting-title">Mức độ nén</div>
+          <div id="levelPill" class="level-pill">50%</div>
+        </div>
+
+        <div class="range-wrap">
+          <input id="compressionRange" type="range" min="10" max="90" step="5" value="50" aria-label="Mức độ nén PDF" />
+          <div class="range-labels">
+            <span>10% · Chất lượng cao</span>
+            <span>90% · File nhỏ</span>
+          </div>
+        </div>
+
+        <div id="ultraCard" class="ultra-card">
+          <label class="ultra-toggle" for="ultraToggle">
+            <input id="ultraToggle" type="checkbox" />
+            <span>
+              <div class="ultra-title">⚡ Siêu nén</div>
+              <div class="ultra-desc">Dành cho PDF ảnh siêu nét / dung lượng rất lớn. Chế độ nhanh giúp Siêu nén xử lý gọn hơn và giảm RAM tạm.</div>
+            </span>
+          </label>
+
+          <div id="ultraControls" class="ultra-controls">
+            <div class="ultra-head">
+              <div class="setting-title">Hệ số siêu nén</div>
+              <div id="ultraValue" class="ultra-value">x2</div>
+            </div>
+            <input id="ultraRange" type="range" min="2" max="4" step="1" value="2" aria-label="Hệ số siêu nén" />
+            <div class="range-labels">
+              <span>x2</span>
+              <span>x3</span>
+              <span>x4</span>
+            </div>
+            <div class="ultra-warning"><strong>Siêu nén:</strong> chọn x2, x3 hoặc x4 để tăng độ nén. Mức càng cao thì file càng nhỏ và chất lượng hình ảnh sẽ giảm nhiều hơn. <strong>Chế độ nhanh:</strong> nén trực tiếp 1 lượt để tiết kiệm thời gian và RAM.</div>
+          </div>
+        </div>
+
+        <div class="estimate-grid">
+          <div class="metric">
+            <div class="metric-label">Dung lượng ước tính</div>
+            <div id="estimatedSize" class="metric-value">~ 0.00 MB</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Dự kiến giảm</div>
+            <div id="estimatedSaving" class="metric-value green">0%</div>
+          </div>
+        </div>
+
+        <button id="compressBtn" class="compress-btn" type="button">Nén PDF & tải xuống</button>
+      </div>
+
+      <div id="statusBox" class="status-box" aria-live="polite"></div>
+
+      <p class="note">
+        <strong>Lưu ý:</strong> chế độ nén này chuyển từng trang sang ảnh JPEG tối ưu rồi tạo lại PDF, vì vậy có thể làm mất khả năng chọn văn bản, hyperlink, form và một số thành phần tương tác. V7 ưu tiên tốc độ và RAM thấp bằng cơ chế 1 lượt, đọc file qua Blob URL và tái sử dụng một Canvas. Dung lượng thực tế có thể lệch so với ước tính tùy nội dung từng PDF. File PDF không được gửi lên server; trình duyệt chỉ tải thư viện JavaScript từ CDN.
+      </p>
+    </section>
+  </main>
+
+  <script type="module">
+    // PDF Compressor V7 Fast/Low-RAM: one-pass raster compression.
+    import * as pdfjsLib from 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.min.mjs';
+
+    // Worker của PDF.js cũng chạy ở phía trình duyệt để đọc/render PDF nhanh hơn.
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/build/pdf.worker.min.mjs';
+
+    const { PDFDocument } = window.PDFLib;
+
+    const dropzone = document.getElementById('dropzone');
+    const chooseBtn = document.getElementById('chooseBtn');
+    const fileInput = document.getElementById('fileInput');
+    const fileCard = document.getElementById('fileCard');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeBtn = document.getElementById('removeBtn');
+    const settings = document.getElementById('settings');
+    const compressionRange = document.getElementById('compressionRange');
+    const levelPill = document.getElementById('levelPill');
+    const ultraCard = document.getElementById('ultraCard');
+    const ultraToggle = document.getElementById('ultraToggle');
+    const ultraControls = document.getElementById('ultraControls');
+    const ultraRange = document.getElementById('ultraRange');
+    const ultraValue = document.getElementById('ultraValue');
+    const estimatedSize = document.getElementById('estimatedSize');
+    const estimatedSaving = document.getElementById('estimatedSaving');
+    const compressBtn = document.getElementById('compressBtn');
+    const statusBox = document.getElementById('statusBox');
+
+    let selectedFile = null;
+    let isProcessing = false;
+
+    function bytesToMB(bytes) {
+      return bytes / (1024 * 1024);
+    }
+
+    function formatMB(bytes) {
+      return `${bytesToMB(bytes).toFixed(2)} MB`;
+    }
+
+    function clamp(value, min, max) {
+      return Math.min(max, Math.max(min, value));
+    }
+
+    /**
+     * Nhận file PDF do người dùng chọn/kéo thả.
+     * Kiểm tra cả đuôi file và MIME type để giảm trường hợp chọn nhầm định dạng.
+     */
+    function handleFile(file) {
+      hideStatus();
+
+      if (!file) return;
+
+      const hasPdfExtension = file.name.toLowerCase().endsWith('.pdf');
+
+      if (!hasPdfExtension) {
+        resetFile();
+        showError('Vui lòng chọn đúng file có định dạng .pdf.');
+        return;
+      }
+
+      selectedFile = file;
+      fileName.textContent = file.name;
+      fileSize.textContent = `Dung lượng gốc: ${formatMB(file.size)}`;
+      fileCard.classList.add('show');
+      settings.classList.add('show');
+      updateEstimate();
+    }
+
+    function resetFile() {
+      selectedFile = null;
+      fileInput.value = '';
+      fileCard.classList.remove('show');
+      settings.classList.remove('show');
+      if (!isProcessing) hideStatus();
+    }
+
+    /**
+     * V6: mục tiêu giảm dung lượng theo thanh chính + Siêu nén cộng dồn.
+     *
+     * Quy tắc người dùng yêu cầu:
+     * - Nén thường: dùng đúng mục tiêu của thanh chính.
+     * - x2: giảm THÊM 40% phần dung lượng còn lại sau nén thường.
+     * - x3: tiếp tục giảm THÊM 40% phần dung lượng còn lại của x2.
+     * - x4: tiếp tục giảm THÊM 40% phần dung lượng còn lại của x3.
+     *
+     * Ví dụ nén thường còn 50 MB:
+     * x2 => 50 × 0.60 = 30 MB
+     * x3 => 30 × 0.60 = 18 MB
+     * x4 => 18 × 0.60 = 10.8 MB
+     */
+    function getTargetSavingRatio(uiCompression, ultraMultiplier = 1) {
+      const value = clamp(Number(uiCompression), 10, 90);
+      const points = [
+        [10, 0.10], [20, 0.14], [30, 0.18], [40, 0.23],
+        [50, 0.30], [60, 0.38], [70, 0.46], [80, 0.53], [90, 0.59]
+      ];
+
+      let baseSaving = points[points.length - 1][1];
+      for (let i = 0; i < points.length - 1; i++) {
+        const [x1, y1] = points[i];
+        const [x2, y2] = points[i + 1];
+        if (value >= x1 && value <= x2) {
+          const t = (value - x1) / (x2 - x1);
+          baseSaving = y1 + (y2 - y1) * t;
+          break;
+        }
+      }
+
+      const multiplier = clamp(Math.round(Number(ultraMultiplier) || 1), 1, 4);
+      if (multiplier <= 1) return baseSaving;
+
+      // Mỗi cấp sau nén thường giữ lại 60% dung lượng của cấp trước.
+      // x2 = 1 bước; x3 = 2 bước; x4 = 3 bước.
+      const extraStages = multiplier - 1;
+      const baseRemaining = 1 - baseSaving;
+      const ultraRemaining = baseRemaining * Math.pow(0.60, extraStages);
+
+      return clamp(1 - ultraRemaining, 0.05, 0.97);
+    }
+
+    function getUltraMultiplier() {
+      return ultraToggle.checked ? Number(ultraRange.value) : 1;
+    }
+
+    /**
+     * Ước tính V4 bám theo mục tiêu của thanh trượt.
+     * Sau lượt nén đầu, ứng dụng sẽ tự cân chỉnh thêm nếu kết quả lệch quá xa.
+     */
+    function updateEstimate() {
+      const uiCompression = Number(compressionRange.value);
+      const ultraMultiplier = getUltraMultiplier();
+      const targetSavingRatio = getTargetSavingRatio(uiCompression, ultraMultiplier);
+
+      levelPill.textContent = ultraMultiplier > 1 ? `${uiCompression}% · x${ultraMultiplier}` : `${uiCompression}%`;
+      ultraValue.textContent = `x${Number(ultraRange.value)}`;
+      updateRangeFill();
+    updateUltraFill();
+
+      if (!selectedFile) return;
+
+      const estimatedBytes = selectedFile.size * (1 - targetSavingRatio);
+      estimatedSize.textContent = `~ ${formatMB(estimatedBytes)}`;
+      estimatedSaving.textContent = `~ ${Math.round(targetSavingRatio * 100)}%`;
+    }
+
+    function updateRangeFill() {
+      const min = Number(compressionRange.min);
+      const max = Number(compressionRange.max);
+      const value = Number(compressionRange.value);
+      const percent = ((value - min) / (max - min)) * 100;
+
+      compressionRange.style.background =
+        `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percent}%, #dbe2ee ${percent}%, #dbe2ee 100%)`;
+    }
+
+    function updateUltraFill() {
+      const min = Number(ultraRange.min);
+      const max = Number(ultraRange.max);
+      const value = Number(ultraRange.value);
+      const percent = ((value - min) / (max - min)) * 100;
+      ultraRange.style.background =
+        `linear-gradient(to right, var(--primary) 0%, var(--primary) ${percent}%, #dbe2ee ${percent}%, #dbe2ee 100%)`;
+    }
+
+    /**
+     * Profile khởi đầu V6.
+     * Siêu nén làm giảm đồng thời độ phân giải, JPEG quality và số pixel Canvas.
+     * Mục tiêu là x2/x3/x4 tạo khác biệt THẬT, không chỉ đổi con số dự báo.
+     */
+    function getCompressionProfile(uiCompression, ultraMultiplier = 1) {
+      const value = clamp(Number(uiCompression), 10, 90);
+      const points = [
+        { x: 10, renderScale: 2.30, jpegQuality: 0.985, maxCanvasPixels: 18_000_000 },
+        { x: 20, renderScale: 2.15, jpegQuality: 0.975, maxCanvasPixels: 16_000_000 },
+        { x: 30, renderScale: 2.00, jpegQuality: 0.960, maxCanvasPixels: 14_000_000 },
+        { x: 40, renderScale: 1.88, jpegQuality: 0.940, maxCanvasPixels: 12_000_000 },
+        { x: 50, renderScale: 1.75, jpegQuality: 0.910, maxCanvasPixels: 10_000_000 },
+        { x: 60, renderScale: 1.60, jpegQuality: 0.875, maxCanvasPixels: 8_500_000 },
+        { x: 70, renderScale: 1.45, jpegQuality: 0.830, maxCanvasPixels: 7_000_000 },
+        { x: 80, renderScale: 1.30, jpegQuality: 0.775, maxCanvasPixels: 5_500_000 },
+        { x: 90, renderScale: 1.15, jpegQuality: 0.715, maxCanvasPixels: 4_500_000 }
+      ];
+
+      let profile = points[points.length - 1];
+      for (let i = 0; i < points.length - 1; i++) {
+        const a = points[i];
+        const b = points[i + 1];
+        if (value >= a.x && value <= b.x) {
+          const t = (value - a.x) / (b.x - a.x);
+          profile = {
+            renderScale: a.renderScale + (b.renderScale - a.renderScale) * t,
+            jpegQuality: a.jpegQuality + (b.jpegQuality - a.jpegQuality) * t,
+            maxCanvasPixels: Math.round(a.maxCanvasPixels + (b.maxCanvasPixels - a.maxCanvasPixels) * t)
+          };
+          break;
+        }
+      }
+
+      const multiplier = clamp(Number(ultraMultiplier) || 1, 1, 4);
+      if (multiplier <= 1) {
+        return {
+          renderScale: profile.renderScale,
+          jpegQuality: profile.jpegQuality,
+          maxCanvasPixels: profile.maxCanvasPixels
+        };
+      }
+
+      // V6: profile khởi đầu mạnh hơn để phù hợp quy tắc cộng dồn -40% mỗi cấp.
+      // Bộ tự cân chỉnh phía sau vẫn đo dung lượng THẬT và điều chỉnh lại nếu lệch mục tiêu.
+      const ultraFactors = {
+        2: { scale: 0.68, qualityDrop: 0.15, pixels: 0.48 },
+        3: { scale: 0.50, qualityDrop: 0.25, pixels: 0.30 },
+        4: { scale: 0.38, qualityDrop: 0.34, pixels: 0.18 }
+      };
+      const f = ultraFactors[Math.round(multiplier)] || ultraFactors[2];
+
+      return {
+        renderScale: clamp(profile.renderScale * f.scale, 0.38, 3.20),
+        jpegQuality: clamp(profile.jpegQuality - f.qualityDrop, 0.30, 0.995),
+        maxCanvasPixels: Math.round(clamp(profile.maxCanvasPixels * f.pixels, 900_000, 28_000_000))
+      };
+    }
+
+    /**
+     * V7 Fast bỏ cơ chế nén lại toàn bộ tài liệu nhiều lượt.
+     * Profile được tính trước từ thanh nén + x2/x3/x4 và chạy đúng 1 lượt.
+     * Điều này giúp tốc độ tăng mạnh và tránh giữ nhiều kết quả PDF trung gian trong RAM.
+     */
+
+    function canvasToJpegBlob(canvas, quality) {
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(
+          blob => blob ? resolve(blob) : reject(new Error('Không thể tạo ảnh JPEG từ trang PDF.')),
+          'image/jpeg',
+          quality
+        );
+      });
+    }
+
+    /**
+     * Tính scale an toàn theo cả chiều ảnh và tổng số pixel.
+     * Tổng pixel quan trọng vì một Canvas 4000x4000 có thể chiếm hàng chục MB RAM.
+     */
+    function getSafeRenderScale(baseViewport, requestedScale, requestedMaxPixels) {
+      const deviceMemory = Number(navigator.deviceMemory || 4);
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      // V4: mức nén thấp được phép dùng Canvas lớn hơn để giữ chi tiết tốt hơn.
+      const devicePixelCap = isMobile
+        ? (deviceMemory <= 4 ? 7_000_000 : 11_000_000)
+        : (deviceMemory <= 4 ? 12_000_000 : 28_000_000);
+      const MAX_CANVAS_PIXELS = Math.min(requestedMaxPixels || 8_000_000, devicePixelCap);
+      const MAX_CANVAS_DIMENSION = isMobile ? 5000 : 7000;
+
+      const dimensionScale = MAX_CANVAS_DIMENSION / Math.max(baseViewport.width, baseViewport.height);
+      const pixelScale = Math.sqrt(MAX_CANVAS_PIXELS / (baseViewport.width * baseViewport.height));
+
+      return Math.max(0.28, Math.min(requestedScale, dimensionScale, pixelScale));
+    }
+
+    /**
+     * Render một trang theo cơ chế tự phục hồi nhưng TÁI SỬ DỤNG cùng một Canvas.
+     * Không tạo Canvas mới cho từng trang/lần thử => giảm GC, giảm peak RAM và nhanh hơn.
+     */
+    async function renderPageToJpeg(page, baseViewport, requestedScale, jpegQuality, maxCanvasPixels, sharedCanvas) {
+      const firstScale = getSafeRenderScale(baseViewport, requestedScale, maxCanvasPixels);
+      const retryFactors = [1, 0.72, 0.52];
+      let lastError = null;
+
+      for (let attempt = 0; attempt < retryFactors.length; attempt++) {
+        const scale = Math.max(0.25, firstScale * retryFactors[attempt]);
+        const viewport = page.getViewport({ scale });
+        const canvas = sharedCanvas;
+
+        try {
+          canvas.width = Math.max(1, Math.floor(viewport.width));
+          canvas.height = Math.max(1, Math.floor(viewport.height));
+
+          const ctx = canvas.getContext('2d', {
+            alpha: false,
+            willReadFrequently: false
+          });
+          if (!ctx) throw new Error('Trình duyệt không hỗ trợ Canvas 2D.');
+
+          ctx.save();
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.restore();
+
+          const renderParams = {
+            canvasContext: ctx,
+            viewport,
+            background: 'rgb(255,255,255)',
+            intent: 'display'
+          };
+
+          // Bỏ annotation/form khi rasterize để giảm một phần công việc không cần thiết.
+          if (pdfjsLib.AnnotationMode?.DISABLE !== undefined) {
+            renderParams.annotationMode = pdfjsLib.AnnotationMode.DISABLE;
+          }
+
+          const renderTask = page.render(renderParams);
+          await renderTask.promise;
+
+          const effectiveQuality = Math.max(0.28, jpegQuality - attempt * 0.05);
+          return await canvasToJpegBlob(canvas, effectiveQuality);
+        } catch (error) {
+          lastError = error;
+          console.warn(`Render trang thất bại lần ${attempt + 1}, đang thử scale thấp hơn…`, error);
+
+          // Thu nhỏ ngay backing store trước khi retry để trả RAM cho trình duyệt.
+          canvas.width = 1;
+          canvas.height = 1;
+        }
+      }
+
+      throw lastError || new Error('Không thể render trang PDF sau nhiều lần thử.');
+    }
+
+    /**
+     * V7 FAST / LOW-RAM:
+     * 1) Không gọi file.arrayBuffer() cho toàn bộ file ở main thread; PDF.js đọc qua Blob URL.
+     * 2) Chỉ nén đúng 1 lượt - không render lại toàn bộ PDF để tự cân chỉnh.
+     * 3) Chỉ dùng 1 Canvas dùng chung cho mọi trang, xử lý tuần tự từng trang.
+     * 4) Sau mỗi trang: cleanup trang + thu Canvas về 1x1 để trả backing-store RAM.
+     * 5) Giảm số lần yield UI; chỉ nhường luồng theo nhóm trang để tăng tốc.
+     */
+    async function compressPdf(file, compression, profileOverride = null, passLabel = '') {
+      let sourcePdf = null;
+      let loadingTask = null;
+      let sourceUrl = null;
+      const sharedCanvas = document.createElement('canvas');
+
+      try {
+        sourceUrl = URL.createObjectURL(file);
+        const PDFJS_BASE = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@6.3.289/';
+
+        loadingTask = pdfjsLib.getDocument({
+          url: sourceUrl,
+          cMapUrl: `${PDFJS_BASE}cmaps/`,
+          cMapPacked: true,
+          standardFontDataUrl: `${PDFJS_BASE}standard_fonts/`,
+          wasmUrl: `${PDFJS_BASE}wasm/`,
+          stopAtErrors: false,
+          isEvalSupported: true,
+          disableAutoFetch: false,
+          disableStream: false,
+          disableRange: false
+        });
+
+        loadingTask.onPassword = (updatePassword, reason) => {
+          const incorrect = reason === pdfjsLib.PasswordResponses.INCORRECT_PASSWORD;
+          const password = window.prompt(
+            incorrect
+              ? 'Mật khẩu chưa đúng. Vui lòng nhập lại mật khẩu PDF:'
+              : 'PDF này được bảo vệ. Vui lòng nhập mật khẩu để tiếp tục:'
+          );
+
+          if (password === null) {
+            loadingTask.destroy();
+            return;
+          }
+          updatePassword(password);
+        };
+
+        sourcePdf = await loadingTask.promise;
+        const outputPdf = await PDFDocument.create();
+        const { renderScale, jpegQuality, maxCanvasPixels } = profileOverride || getCompressionProfile(compression);
+        const totalPages = sourcePdf.numPages;
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const yieldEvery = isMobile ? 2 : 5;
+
+        if (!totalPages) throw new Error('PDF không có trang nào để xử lý.');
+
+        for (let pageNumber = 1; pageNumber <= totalPages; pageNumber++) {
+          updateProgress(pageNumber - 1, totalPages, `${passLabel ? passLabel + ' · ' : ''}Đang xử lý trang ${pageNumber}/${totalPages}…`);
+
+          let page = null;
+          let jpegBlob = null;
+          let jpegBuffer = null;
+          let image = null;
+
+          try {
+            page = await sourcePdf.getPage(pageNumber);
+            const baseViewport = page.getViewport({ scale: 1 });
+
+            jpegBlob = await renderPageToJpeg(
+              page,
+              baseViewport,
+              renderScale,
+              jpegQuality,
+              maxCanvasPixels,
+              sharedCanvas
+            );
+
+            // Dùng ArrayBuffer trực tiếp; tránh tạo thêm Uint8Array wrapper/copy không cần thiết.
+            jpegBuffer = await jpegBlob.arrayBuffer();
+            image = await outputPdf.embedJpg(jpegBuffer);
+
+            const outPage = outputPdf.addPage([baseViewport.width, baseViewport.height]);
+            outPage.drawImage(image, {
+              x: 0,
+              y: 0,
+              width: baseViewport.width,
+              height: baseViewport.height
+            });
+          } catch (pageError) {
+            const msg = String(pageError?.message || pageError);
+            throw new Error(`Không xử lý được trang ${pageNumber}/${totalPages}: ${msg}`);
+          } finally {
+            if (page) {
+              try { page.cleanup(); } catch (_) {}
+            }
+
+            // Hạ backing store về cực nhỏ ngay sau mỗi trang.
+            sharedCanvas.width = 1;
+            sharedCanvas.height = 1;
+            jpegBlob = null;
+            jpegBuffer = null;
+            image = null;
+          }
+
+          updateProgress(pageNumber, totalPages, `${passLabel ? passLabel + ' · ' : ''}Đã xử lý ${pageNumber}/${totalPages} trang`);
+
+          // Không yield ở mọi trang như V6. Desktop mỗi 5 trang, mobile mỗi 2 trang.
+          if (pageNumber % yieldEvery === 0) {
+            await new Promise(resolve => requestAnimationFrame(() => resolve()));
+          }
+        }
+
+        try { await sourcePdf.cleanup(); } catch (_) {}
+
+        updateProgress(totalPages, totalPages, 'Đang đóng gói file PDF đầu ra…');
+        return await outputPdf.save({
+          useObjectStreams: true,
+          addDefaultPage: false,
+          objectsPerTick: 50
+        });
+      } finally {
+        sharedCanvas.width = 1;
+        sharedCanvas.height = 1;
+
+        if (sourcePdf) {
+          try { await sourcePdf.destroy(); } catch (_) {}
+        } else if (loadingTask) {
+          try { await loadingTask.destroy(); } catch (_) {}
+        }
+
+        if (sourceUrl) {
+          try { URL.revokeObjectURL(sourceUrl); } catch (_) {}
+        }
+      }
+    }
+
+    function makeOutputFileName(originalName) {
+      const base = originalName.replace(/\.pdf$/i, '');
+      return `${base}_compressed.pdf`;
+    }
+
+    function downloadBytes(bytes, filename) {
+      const blob = new Blob([bytes], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1500);
+    }
+
+    function showLoading(text = 'Đang nén PDF…') {
+      statusBox.className = 'status-box show';
+      statusBox.innerHTML = `
+        <div class="loading-row"><span class="spinner" aria-hidden="true"></span><span id="loadingText">${text}</span></div>
+        <div class="progress" aria-hidden="true"><div id="progressBar" class="progress-bar"></div></div>
+        <div id="statusDetail" class="status-detail">Vui lòng giữ tab này mở trong lúc xử lý.</div>
+      `;
+    }
+
+    function updateProgress(done, total, text) {
+      const loadingText = document.getElementById('loadingText');
+      const progressBar = document.getElementById('progressBar');
+      const statusDetail = document.getElementById('statusDetail');
+
+      if (loadingText) loadingText.textContent = text;
+      if (progressBar) progressBar.style.width = `${total ? (done / total) * 100 : 0}%`;
+      if (statusDetail && total) statusDetail.textContent = `Tiến độ: ${Math.round((done / total) * 100)}%`;
+    }
+
+    function showSuccess(originalBytes, outputBytes, targetSavingRatio = null) {
+      const change = originalBytes > 0 ? (1 - outputBytes / originalBytes) * 100 : 0;
+      const reduced = change > 0;
+      const targetText = Number.isFinite(targetSavingRatio)
+        ? ` · Mục tiêu khoảng <strong>${Math.round(targetSavingRatio * 100)}%</strong>.`
+        : '';
+
+      statusBox.className = 'status-box show success';
+      statusBox.innerHTML = `
+        <strong>✓ Nén PDF hoàn tất.</strong><br>
+        Dung lượng thực tế: <strong>${formatMB(outputBytes)}</strong>
+        ${reduced
+          ? ` · Giảm <strong>${change.toFixed(1)}%</strong> so với file gốc.${targetText}`
+          : ` · File mới không nhỏ hơn file gốc (${Math.abs(change).toFixed(1)}% lớn hơn). Hãy thử tăng mức nén.${targetText}`}
+      `;
+    }
+
+    function showError(message) {
+      statusBox.className = 'status-box show error';
+      statusBox.textContent = `Lỗi: ${message}`;
+    }
+
+    function hideStatus() {
+      statusBox.className = 'status-box';
+      statusBox.innerHTML = '';
+    }
+
+    async function startCompression() {
+      if (!selectedFile || isProcessing) return;
+
+      isProcessing = true;
+      compressBtn.disabled = true;
+      compressionRange.disabled = true;
+      ultraToggle.disabled = true;
+      ultraRange.disabled = true;
+      removeBtn.disabled = true;
+
+      const ultraMultiplier = getUltraMultiplier();
+      showLoading(
+        ultraMultiplier > 1
+          ? `Đang siêu nén x${ultraMultiplier} · chế độ nhanh 1 lượt…`
+          : 'Đang nén PDF · chế độ nhanh 1 lượt…'
+      );
+
+      try {
+        const compression = Number(compressionRange.value);
+        const targetSavingRatio = getTargetSavingRatio(compression, ultraMultiplier);
+        const profile = getCompressionProfile(compression, ultraMultiplier);
+
+        // V7: CHỈ 1 LƯỢT. Không tạo các PDF trung gian và không render lại toàn bộ file.
+        const resultBytes = await compressPdf(
+          selectedFile,
+          compression,
+          profile,
+          ultraMultiplier > 1 ? `Siêu nén x${ultraMultiplier}` : 'Nén nhanh'
+        );
+
+        const outputName = makeOutputFileName(selectedFile.name);
+        downloadBytes(resultBytes, outputName);
+        showSuccess(selectedFile.size, resultBytes.byteLength, targetSavingRatio);
+      } catch (error) {
+        console.error(error);
+        const message = String(error?.message || error);
+
+        if (/password|encrypted/i.test(message)) {
+          showError('Không thể mở PDF được bảo vệ. Hãy kiểm tra lại mật khẩu rồi thử lại.');
+        } else if (/canvas|memory|allocation|out of memory|array buffer|detached|too large/i.test(message)) {
+          showError('Thiết bị đang thiếu bộ nhớ để xử lý PDF này. Hãy tăng mức nén hoặc Siêu nén x3–x4, đóng bớt tab trình duyệt rồi thử lại. Chi tiết: ' + message);
+        } else if (/trang \d+\/\d+/i.test(message)) {
+          showError(message + ' Ứng dụng đã tự giảm độ phân giải của riêng trang lỗi và thử lại nhưng vẫn không render được.');
+        } else {
+          showError('Không thể nén PDF. Chi tiết kỹ thuật: ' + message);
+        }
+      } finally {
+        isProcessing = false;
+        compressBtn.disabled = false;
+        compressionRange.disabled = false;
+        ultraToggle.disabled = false;
+        ultraRange.disabled = false;
+        removeBtn.disabled = false;
+      }
+    }
+
+    // Mở hộp thoại chọn file.
+    chooseBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      fileInput.click();
+    });
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        fileInput.click();
+      }
+    });
+
+    fileInput.addEventListener('change', () => handleFile(fileInput.files?.[0]));
+    removeBtn.addEventListener('click', resetFile);
+    compressionRange.addEventListener('input', updateEstimate);
+
+    ultraToggle.addEventListener('change', () => {
+      ultraCard.classList.toggle('active', ultraToggle.checked);
+      ultraControls.classList.toggle('show', ultraToggle.checked);
+      updateUltraFill();
+      updateEstimate();
+    });
+
+    ultraRange.addEventListener('input', () => {
+      ultraValue.textContent = `x${Number(ultraRange.value)}`;
+      updateUltraFill();
+      updateEstimate();
+    });
+
+    compressBtn.addEventListener('click', startCompression);
+
+    // Xử lý Drag & Drop PDF.
+    ['dragenter', 'dragover'].forEach(eventName => {
+      dropzone.addEventListener(eventName, event => {
+        event.preventDefault();
+        event.stopPropagation();
+        dropzone.classList.add('dragover');
+      });
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+      dropzone.addEventListener(eventName, event => {
+        event.preventDefault();
+        event.stopPropagation();
+        dropzone.classList.remove('dragover');
+      });
+    });
+
+    dropzone.addEventListener('drop', event => {
+      const file = event.dataTransfer?.files?.[0];
+      handleFile(file);
+    });
+
+    updateRangeFill();
+    updateUltraFill();
+  </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<rect width="512" height="512" rx="112" fill="#1a5cff"/>
+<rect x="88" y="92" width="336" height="328" rx="52" fill="#ffffff"/>
+<path d="M132 150h104v78H132zM276 150h104v128H276zM132 268h104v94H132zM276 318h104v44H276z" fill="#eaf1ff" stroke="#1a5cff" stroke-width="14"/>
+<path d="M236 92v328M88 248h336" stroke="#1a5cff" stroke-width="14" opacity=".18"/>
+<circle cx="354" cy="358" r="74" fill="#1a5cff"/>
+<path d="M354 318v80M314 358h80" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
+<text x="119" y="405" font-family="Arial,Helvetica,sans-serif" font-size="56" font-weight="800" fill="#1a5cff">GPP</text>
+</svg>

@@ -1,0 +1,1807 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#1a5cff" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="GPP Sơ đồ" />
+  <meta name="application-name" content="GPP Sơ đồ" />
+  <meta name="description" content="Trợ lý vẽ sơ đồ bố trí cơ sở bán lẻ thuốc GPP." />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" type="image/svg+xml" href="./icons/gpp-icon.svg" />
+  <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png" />
+  <title>Trợ lý vẽ sơ đồ GPP</title>
+  <style>
+    :root {
+      --bg: #f2f5f9;
+      --panel: #fff;
+      --ink: #1a2634;
+      --muted: #6b7a8a;
+      --line: #dde3ed;
+      --accent: #1a5cff;
+      --danger: #d14545;
+      --ok: #1d8b5e;
+      --shadow: 0 8px 24px rgba(0, 20, 40, .08);
+      --radius: 10px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      height: 100vh;
+      overflow: hidden;
+    }
+    button, input { font: inherit; }
+
+    .app {
+      display: grid;
+      grid-template-columns: 220px 1fr 220px;
+      grid-template-rows: 52px 1fr;
+      height: 100vh;
+      gap: 0;
+    }
+
+    .topbar {
+      grid-column: 1 / -1;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 10;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 900;
+    }
+    .brand small {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    .actions {
+      display: flex;
+      gap: 6px;
+    }
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      border-radius: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--ink);
+      transition: .15s;
+    }
+    .btn:hover { background: #f0f4fe; border-color: #b3c9ff; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .btn.primary:hover { background: #0044d4; }
+    .btn.danger { color: var(--danger); }
+    .btn.danger:hover { background: #fee8e8; }
+
+    .sidebar {
+      background: var(--panel);
+      padding: 14px 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .sidebar-left {
+      border-right: 1px solid var(--line);
+      grid-column: 1;
+      grid-row: 2;
+      overflow: hidden;
+      gap: 8px;
+      padding: 10px;
+    }
+    .sidebar-left .section:first-child {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-left .section:first-child h3 { margin-bottom: 5px; flex: 0 0 auto; }
+    .sidebar-left .section:last-child { flex: 0 0 auto; }
+    .sidebar-right {
+      border-left: 1px solid var(--line);
+      grid-column: 3;
+      grid-row: 2;
+      overflow: hidden;
+      gap: 8px;
+      padding: 10px;
+    }
+    .sidebar-right .section { min-height: 0; }
+    .sidebar-right .section h3 { margin-bottom: 5px; }
+    .sidebar-right .inspector { padding: 8px; font-size: 11px; }
+    .sidebar-right .field { margin: 5px 0; }
+    .sidebar-right .mini-actions { margin-top: 4px; gap: 4px; }
+    .sidebar-right .mini-actions .btn { padding: 5px 4px; font-size: 10px; }
+    .sidebar-right #rotate90 { margin-top: 4px !important; padding: 5px 6px; font-size: 10px; }
+    .sidebar-right .status-head { padding: 5px 8px; }
+    .sidebar-right .status-list {
+      padding: 3px 7px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 7px;
+    }
+    .sidebar-right .status-row { font-size: 9px; padding: 2px 0; gap: 4px; }
+
+    .section h3 {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .library {
+      display: grid;
+      grid-template-columns: repeat(var(--library-cols, 2), minmax(0, 1fr));
+      grid-template-rows: repeat(var(--library-rows, 1), minmax(0, 1fr));
+      gap: var(--library-gap, 3px);
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .lib-item {
+      border: 1px solid var(--line);
+      border-radius: 5px;
+      padding: 1px 3px;
+      min-height: 0;
+      height: 100%;
+      cursor: grab;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: var(--library-icon-gap, 3px);
+      text-align: left;
+      font-size: var(--library-font, 8.5px);
+      font-weight: 700;
+      line-height: 1.05;
+      background: #fafcff;
+      transition: .1s;
+      user-select: none;
+      overflow: hidden;
+    }
+    .lib-icon {
+      width: var(--library-icon, 12px);
+      height: var(--library-icon, 12px);
+      flex: 0 0 var(--library-icon, 12px);
+      display: grid;
+      place-items: center;
+      color: #526477;
+    }
+    .lib-icon svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
+    }
+    .lib-label {
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      word-break: break-word;
+      max-width: 100%;
+      min-width: 0;
+    }
+    .lib-item:hover { border-color: var(--accent); background: #f2f7ff; }
+    .lib-item.user-library { border-color: #b8caff; background: #f7f9ff; }
+    .library.delete-mode .lib-item {
+      cursor: pointer;
+      border-color: var(--danger);
+      background: #fff1f1;
+      box-shadow: 0 0 0 1px rgba(209,69,69,.08);
+    }
+
+    .library-manage { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+    .library-manage .btn { padding: 5px 2px; font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .library-manage .btn.active { background: #fff1f1; border-color: var(--danger); color: var(--danger); }
+
+    .left-tools { display: grid; gap: 6px; }
+    .left-tools .btn { width: 100%; font-size: 11px; padding: 7px 8px; }
+    .saved-plans { display: grid; gap: 6px; }
+    .saved-plans select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      background: #fff;
+      color: var(--ink);
+      padding: 6px 7px;
+      font-size: 11px;
+      outline: none;
+    }
+    .saved-plan-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .saved-plan-actions .btn { font-size: 10px; padding: 6px 4px; }
+    .sidebar-right .saved-plans { gap: 4px; }
+    .sidebar-right .saved-plans select { padding: 5px 6px; font-size: 10px; }
+    .sidebar-right .saved-plans > .btn { padding: 6px 5px; font-size: 10px; }
+    .sidebar-right .saved-plan-actions { gap: 4px; }
+    .sidebar-right .saved-plan-actions .btn { padding: 5px 3px; font-size: 9px; }
+
+    .inspector {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      background: #fafcff;
+      font-size: 12px;
+    }
+    .inspector.empty { color: var(--muted); }
+    .field { margin: 8px 0; }
+    .field label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; margin-bottom: 4px; }
+    .field input[type="range"] { width: 100%; height: 4px; }
+
+    .mini-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .mini-actions .btn { padding: 6px; font-size: 11px; }
+
+    .statusbox {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .status-head {
+      padding: 8px 12px;
+      background: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .status-list { padding: 6px 10px; }
+    .status-row {
+      display: flex;
+      gap: 6px;
+      font-size: 10px;
+      padding: 4px 0;
+      color: var(--muted);
+    }
+    .status-row.ok { color: var(--ok); font-weight: 700; }
+
+    .workspace {
+      grid-column: 2;
+      grid-row: 2;
+      padding: 16px;
+      overflow: auto;
+      background: var(--bg);
+    }
+    .paper-wrap {
+      display: flex;
+      justify-content: center;
+      min-width: 700px;
+    }
+    .paper {
+      width: 740px;
+      min-height: 1000px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      padding: 40px 48px 32px;
+      border-radius: 4px;
+      position: relative;
+    }
+
+    /* ---- Văn bản pháp luật (giữ nguyên chính xác) ---- */
+    .doc-title { text-align: center; margin-bottom: 12px; }
+    .doc-title .country {
+      font-family: "Times New Roman", serif;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .doc-title .motto {
+      font-family: "Times New Roman", serif;
+      font-weight: 700;
+      text-decoration: underline;
+      font-size: 14px;
+      margin-top: 2px;
+    }
+    .doc-title h1 {
+      font-family: "Times New Roman", serif;
+      font-size: 16px;
+      margin: 14px 0 12px;
+    }
+
+    .meta {
+      font-family: "Times New Roman", serif;
+      font-size: 13px;
+      margin-bottom: 8px;
+    }
+    .meta-row {
+      display: grid;
+      grid-template-columns: 155px 1fr;
+      align-items: end;
+      margin: 2px 0;
+    }
+    .meta-row label {
+      font-weight: 700;
+      white-space: pre;
+    }
+    .meta-row input {
+      border: 0;
+      border-bottom: 1px dotted #888;
+      padding: 0 4px 1px;
+      outline: none;
+      background: transparent;
+      font-size: 13px;
+      font-family: "Times New Roman", serif;
+    }
+    .meta-area {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .meta-area input {
+      width: 80px;
+      border-bottom: 1px dotted #888;
+      border-top: 0;
+      border-left: 0;
+      border-right: 0;
+      background: transparent;
+      outline: none;
+      padding: 0 4px;
+      font-family: "Times New Roman", serif;
+      font-size: 13px;
+    }
+    .meta-area span {
+      font-family: "Times New Roman", serif;
+      font-size: 13px;
+    }
+    .meta-note {
+      font-size: 12px;
+      margin-top: 4px;
+      color: #3d4a5a;
+    }
+    .meta-note span {
+      border-bottom: 1px dotted #888;
+      padding: 0 6px;
+    }
+
+    .part-title {
+      font-family: "Times New Roman", serif;
+      font-weight: 700;
+      font-size: 14px;
+      margin: 6px 0 6px;
+    }
+
+    .layout-box {
+      border: 2px solid #111;
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      height: 400px;
+    }
+    .legend {
+      border-right: 1px solid #111;
+      padding: 8px 6px;
+      font-family: "Times New Roman", serif;
+      font-size: 11px;
+      line-height: 1.5;
+      overflow-y: auto;
+    }
+    .legend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1px 0;
+    }
+    .legend-item .del-btn {
+      cursor: pointer;
+      color: var(--danger);
+      font-weight: 700;
+      font-size: 13px;
+      background: none;
+      border: none;
+      padding: 0 4px;
+      line-height: 1;
+    }
+
+    .draw-area {
+      position: relative;
+      overflow: hidden;
+      background: #fff;
+      touch-action: none;
+    }
+    .draw-area.dragover { background: #f5f9ff; outline: 2px dashed var(--accent); outline-offset: -4px; }
+
+    .draw-item {
+      position: absolute;
+      border: 1.5px solid #26384b;
+      border-radius: 4px;
+      background: #f7f9fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2px;
+      font-size: 9px;
+      font-weight: 700;
+      line-height: 1.1;
+      cursor: move;
+      user-select: none;
+      transform-origin: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+      transition: box-shadow .1s;
+      font-family: Inter, system-ui, sans-serif;
+    }
+    .draw-item.selected {
+      outline: 2px solid rgba(26, 92, 255, .4);
+      border-color: var(--accent);
+      z-index: 4;
+    }
+    .draw-item.is-aircon { border-radius: 10px; background: #e3f0ff; }
+    .draw-item.is-door { border-style: dashed; background: #fff6e0; }
+    .draw-item.is-consult { background: #e5f9f0; }
+    .draw-item.is-special { background: #ffeae6; }
+    .draw-item.is-fridge { background: #e2f3ff; }
+
+    .bottom-text {
+      font-family: "Times New Roman", serif;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .signature {
+      width: 300px;
+      margin: 16px 0 0 auto;
+      text-align: center;
+      font-family: "Times New Roman", serif;
+    }
+    .signature .date {
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .date-input-group {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      border-bottom: 1px dotted #888;
+      padding: 0 4px 2px 4px;
+      font-family: "Times New Roman", serif;
+      font-size: 13px;
+    }
+    .date-input-group input {
+      border: 0;
+      background: transparent;
+      text-align: center;
+      font-family: "Times New Roman", serif;
+      font-size: 13px;
+      outline: none;
+      padding: 0;
+      margin: 0;
+      color: var(--ink);
+      width: auto;
+      min-width: 20px;
+    }
+    .date-input-group input::placeholder {
+      color: #666;
+      opacity: 0.7;
+    }
+    #placeLocation { width: 60px; }
+    #placeDay { width: 30px; }
+    #placeMonth { width: 30px; }
+    #placeYear { width: 30px; }
+
+    .signature .role {
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.3;
+      margin-top: 4px;
+    }
+    .signature .note {
+      font-style: italic;
+      font-size: 11px;
+      margin-top: 2px;
+    }
+    .signature .signer-name {
+      margin-top: 90px;
+    }
+    .signature .signer-name input {
+      width: 220px;
+      border: 0;
+      border-bottom: 1px dotted #888;
+      text-align: center;
+      font-family: "Times New Roman", serif;
+      font-size: 14px;
+      font-weight: 700;
+      background: transparent;
+      padding: 2px;
+    }
+
+    .toast {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      background: #1e293b;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      opacity: 0;
+      transform: translateY(6px);
+      transition: .2s;
+      z-index: 50;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: none; }
+
+    .mobile-note { display: none; }
+
+    /* ---- PWA: Cài đặt & cập nhật ---- */
+    .pwa-btn {
+      position: relative;
+      white-space: nowrap;
+    }
+    .pwa-btn[hidden] { display: none !important; }
+    .pwa-btn.attention {
+      border-color: #8fb0ff;
+      background: #eef4ff;
+      color: #1246c8;
+      box-shadow: 0 0 0 3px rgba(26,92,255,.08);
+    }
+    .pwa-btn.update-ready {
+      border-color: #f2b84b;
+      background: #fff8e8;
+      color: #8a5a00;
+    }
+    .pwa-dot {
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      right: 4px;
+      top: 3px;
+      background: currentColor;
+      box-shadow: 0 0 0 2px #fff;
+    }
+    .pwa-panel {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      width: min(360px, calc(100vw - 32px));
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 18px 50px rgba(0,20,40,.18);
+      padding: 14px;
+      z-index: 80;
+    }
+    .pwa-panel[hidden] { display: none !important; }
+    .pwa-panel-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+    .pwa-panel-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: #eef4ff;
+      color: var(--accent);
+      font-size: 18px;
+      flex: 0 0 auto;
+    }
+    .pwa-panel p {
+      font-size: 11px;
+      line-height: 1.45;
+      color: var(--muted);
+      margin: 4px 0 10px;
+    }
+    .pwa-panel-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+    .pwa-version {
+      font-size: 9px;
+      color: #8a98a8;
+      margin-top: 8px;
+      text-align: right;
+    }
+
+    @media (max-width: 1080px) {
+      .app { grid-template-columns: 190px 1fr 190px; }
+    }
+    @media (max-width: 820px) {
+      .app { display: block; height: auto; overflow: visible; }
+      .mobile-note { display: block; background: #fff4cf; margin: 8px; padding: 8px; border-radius: 6px; font-size: 11px; }
+      .topbar { position: relative; flex-wrap: wrap; }
+      .sidebar { border: 0; border-bottom: 1px solid var(--line); }
+      .sidebar-right { overflow: visible; padding: 12px; gap: 12px; }
+      .sidebar-right .status-list { display: block; }
+      .workspace { padding: 8px; overflow: visible; }
+      .paper-wrap { min-width: 0; justify-content: flex-start; }
+    }
+
+    @media print {
+      @page { size: A4 portrait; margin: 0; }
+      body { background: #fff; }
+      .topbar, .sidebar, .mobile-note, .toast, .pwa-panel { display: none !important; }
+      .app { display: block; height: auto; overflow: visible; }
+      .workspace { padding: 0; overflow: visible; }
+      .paper-wrap { min-width: 0; }
+      .paper { width: 210mm; min-height: 297mm; box-shadow: none; padding: 14mm 17mm 10mm; margin: 0; border-radius: 0; }
+      .layout-box { height: 120mm; }
+      .draw-item { box-shadow: none; }
+      .meta-row input { color: #000; }
+      .draw-area { overflow: hidden; }
+      .signature .signer-name { margin-top: 70px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark">G</span>
+      <div>GPP Sơ đồ<small>Kéo thả · không cần kỹ thuật</small></div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="undoBtn" title="Hoàn tác">↶</button>
+      <button class="btn" id="redoBtn" title="Làm lại">↷</button>
+      <button class="btn" id="saveBtn">💾 Lưu</button>
+      <button class="btn pwa-btn attention" id="installBtn" type="button" title="Cài GPP Sơ đồ lên thiết bị" hidden>⬇ Cài đặt<span class="pwa-dot" aria-hidden="true"></span></button>
+      <button class="btn pwa-btn update-ready" id="updateBtn" type="button" hidden>↻ Cập nhật<span class="pwa-dot" aria-hidden="true"></span></button>
+      <button class="btn primary" id="printBtn">🖨 In</button>
+    </div>
+  </header>
+
+  <aside class="sidebar sidebar-left">
+    <section class="section">
+      <h3>Thư viện</h3>
+      <div class="library" id="library"></div>
+    </section>
+    <section class="section">
+      <button class="btn danger" id="clearBtn" style="width:100%;font-size:11px;">🗑 Xóa tất cả</button>
+    </section>
+  </aside>
+
+  <main class="workspace">
+    <div class="mobile-note">⚠️ Tối ưu cho máy tính. Trên điện thoại thao tác hạn chế.</div>
+    <div class="paper-wrap">
+      <section class="paper" id="paper">
+        <div class="doc-title">
+          <div class="country">CỘNG HOÀ XÃ HỘI CHỦ NGHĨA VIỆT NAM</div>
+          <div class="motto">Độc lập - Tự do - Hạnh Phúc</div>
+          <h1>BẢN VẼ BỐ TRÍ CÁC KHU VỰC CỦA CƠ SỞ BÁN LẺ THUỐC</h1>
+        </div>
+
+        <div class="meta">
+          <div class="meta-row"><label>Cơ sở kinh doanh:</label><input id="business" autocomplete="off" /></div>
+          <div class="meta-row"><label>Địa điểm:</label><input id="address" autocomplete="off" /></div>
+          <div class="meta-row"><label>Người phụ trách :</label><input id="manager" autocomplete="off" /></div>
+          <div class="meta-row">
+            <label>Diện tích:</label>
+            <div class="meta-area">
+              <input id="area" type="text" autocomplete="off" placeholder="0" />
+              <span>m² .</span>
+            </div>
+          </div>
+          <div class="meta-note"><b>Cơ sở riêng biệt và cách xa nguồn ô nhiễm</b> (Nhà vệ sinh không bố trí trong khu vực bảo quản thuốc): <span>Riêng biệt</span></div>
+        </div>
+
+        <div class="part-title">1/ Bản vẽ bố trí các khu vực của cơ sở bán lẻ thuốc:</div>
+        <div class="layout-box">
+          <div class="legend" id="legend"></div>
+          <div class="draw-area" id="drawArea"></div>
+        </div>
+
+        <div class="bottom-text"><b>2/ Sơ đồ địa điểm kinh doanh</b>(Vẽ ở mặt sau: Vẽ rõ vị trí, số nhà, tên phố, phường, ngõ, xóm, các gần nhất và các đặc điểm dễ nhận biết khác…)</div>
+
+        <div class="signature">
+          <div class="date">
+            <div class="date-input-group">
+              <input id="placeLocation" type="text" placeholder="………" />
+              <span>, ngày</span>
+              <input id="placeDay" type="text" placeholder="......" />
+              <span> tháng </span>
+              <input id="placeMonth" type="text" placeholder="......." />
+              <span> năm 20</span>
+              <input id="placeYear" type="text" placeholder="...." />
+            </div>
+          </div>
+          <div class="role">NGƯỜI ĐẠI DIỆN THEO PHÁP LUẬT/<br/>NGƯỜI ĐƯỢC ỦY QUYỀN</div>
+          <div class="note">(Ký, ghi rõ họ tên, chức danh, đóng dấu (nếu có)</div>
+          <div class="signer-name"><input id="signerName" placeholder="Họ và tên" /></div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <aside class="sidebar sidebar-right">
+    <section class="section">
+      <h3>Chỉnh sửa</h3>
+      <div class="inspector empty" id="inspector">Chọn vật thể để chỉnh</div>
+    </section>
+    <section class="section">
+      <h3>Quản lý thư viện</h3>
+      <div class="library-manage">
+        <button class="btn" id="addLibraryBtn" type="button" title="Tạo nút thư viện mới">＋ Tạo</button>
+        <button class="btn danger" id="deleteLibraryBtn" type="button" title="Chọn rồi bấm trực tiếp nút cần xóa">− Xóa</button>
+        <button class="btn" id="restoreLibraryBtn" type="button" title="Khôi phục toàn bộ nút mặc định đã xóa">↺ Mặc định</button>
+      </div>
+    </section>
+    <section class="section">
+      <h3>Sơ đồ đã lưu</h3>
+      <div class="saved-plans">
+        <select id="savedPlanSelect" aria-label="Danh sách sơ đồ đã lưu">
+          <option value="">— Chưa có sơ đồ —</option>
+        </select>
+        <button class="btn primary" id="savePlanBtn" type="button">💾 Lưu sơ đồ hiện tại</button>
+        <div class="saved-plan-actions">
+          <button class="btn" id="loadPlanBtn" type="button">📂 Mở</button>
+          <button class="btn danger" id="deletePlanBtn" type="button">🗑 Xóa bản lưu</button>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <h3>Nội dung chính</h3>
+      <div class="statusbox">
+        <div class="status-head" id="statusHead">0/7</div>
+        <div class="status-list" id="statusList"></div>
+      </div>
+    </section>
+  </aside>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="pwa-panel" id="updatePanel" hidden role="dialog" aria-live="polite" aria-label="Cập nhật ứng dụng">
+  <div class="pwa-panel-title"><span class="pwa-panel-icon">↻</span><span>Có bản cập nhật mới</span></div>
+  <p>Phiên bản mới của GPP Sơ đồ đã sẵn sàng. Dữ liệu bạn đã lưu trên máy vẫn được giữ nguyên.</p>
+  <div class="pwa-panel-actions">
+    <button class="btn" id="laterUpdateBtn" type="button">Để sau</button>
+    <button class="btn primary" id="applyUpdateBtn" type="button">Cập nhật ngay</button>
+  </div>
+</div>
+
+
+<script>
+(() => {
+  // === DANH SÁCH LOẠI ===
+  const TYPES = [
+    { type: 'special', label: 'Thuốc kiểm soát đặc biệt', icon: '🔒', main: true },
+    { type: 'otc', label: 'Thuốc không kê đơn', icon: 'OTC', main: true },
+    { type: 'rx', label: 'Thuốc kê đơn', icon: 'Rx', main: true },
+    { type: 'supplement', label: 'Thực phẩm chức năng', icon: '▤', main: true },
+    { type: 'cosmetic', label: 'Mỹ phẩm', icon: '✦', main: true },
+    { type: 'device', label: 'Trang thiết bị y tế', icon: '✚', main: true },
+    { type: 'aircon', label: 'Máy lạnh', icon: '❄', main: true },
+    { type: 'counter', label: 'Quầy bán thuốc', icon: '▰' },
+    { type: 'consult', label: 'Bàn tư vấn', icon: '☷' },
+    { type: 'fridge', label: 'Tủ bảo quản lạnh', icon: '▣' },
+    { type: 'thermo', label: 'Nhiệt ẩm kế', icon: '🌡' },
+    { type: 'computer', label: 'Máy tính', icon: '▤' },
+    { type: 'records', label: 'Tủ hồ sơ', icon: '▥' },
+    { type: 'door', label: 'Cửa ra vào', icon: '↥' },
+    { type: 'shelf', label: 'Tủ / kệ thuốc', icon: '▦' },
+    { type: 'pickup', label: 'Khu ra lẻ', icon: '🏷️' },
+    { type: 'printer', label: 'Máy in', icon: '🖨️' },
+    { type: 'info', label: 'Thông tin', icon: 'ℹ️' },
+    { type: 'custom', label: 'Tự điền', icon: '📝' }
+  ];
+
+  const drawArea = document.getElementById('drawArea');
+  const library = document.getElementById('library');
+  const inspector = document.getElementById('inspector');
+  const statusHead = document.getElementById('statusHead');
+  const statusList = document.getElementById('statusList');
+  const toast = document.getElementById('toast');
+  const legendEl = document.getElementById('legend');
+
+  let state = {
+    items: [],
+    selected: null,
+    meta: {},
+    dynamicLegend: []
+  };
+
+  let undoStack = [], redoStack = [];
+  let dragging = null;
+
+  const CUSTOM_LIBRARY_KEY = 'gpp-custom-library-v1';
+  const HIDDEN_LIBRARY_KEY = 'gpp-hidden-library-v1';
+  let customLibrary = [];
+  let hiddenLibraryTypes = [];
+  let libraryDeleteMode = false;
+
+  function uid() { return 'i' + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+  function clamp(v,a,b) { return Math.max(a, Math.min(b, v)); }
+
+  function titleCaseLabel(text) {
+    return text.split(' ').map(word => {
+      if (word.length === 0) return word;
+      if (word === word.toUpperCase() && word.length > 1) return word;
+      return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+    }).join(' ');
+  }
+
+  function getType(type) { return TYPES.find(t => t.type === type); }
+  function defaultSize(type) {
+    if (type === 'aircon') return [18,7];
+    if (type === 'door') return [14,7];
+    if (type === 'thermo' || type === 'computer') return [10,8];
+    if (type === 'consult') return [22,12];
+    if (type === 'counter') return [26,10];
+    if (type === 'fridge' || type === 'records') return [14,16];
+    if (type === 'pickup') return [22,10];
+    if (type === 'printer') return [12,9];
+    if (type === 'info') return [24,9];
+    return [22,10];
+  }
+  function clampItemToArea(item, rect = drawArea.getBoundingClientRect()) {
+    const wPx = item.w/100*rect.width, hPx = item.h/100*rect.height;
+    const rad = (item.r||0)*Math.PI/180, c=Math.abs(Math.cos(rad)), sn=Math.abs(Math.sin(rad));
+    const boxW = wPx*c + hPx*sn, boxH = wPx*sn + hPx*c;
+    let cx = (item.x/100*rect.width) + wPx/2, cy = (item.y/100*rect.height) + hPx/2;
+    cx = clamp(cx, boxW/2, rect.width - boxW/2);
+    cy = clamp(cy, boxH/2, rect.height - boxH/2);
+    item.x = (cx - wPx/2)/rect.width*100;
+    item.y = (cy - hPx/2)/rect.height*100;
+    return item;
+  }
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1400);
+  }
+  function snapshot() {
+    return JSON.stringify({
+      items: state.items,
+      meta: state.meta,
+      dynamicLegend: state.dynamicLegend
+    });
+  }
+  function pushHistory() {
+    undoStack.push(snapshot());
+    if (undoStack.length > 50) undoStack.shift();
+    redoStack = [];
+    updateHistoryBtns();
+  }
+  function restore(raw) {
+    const s = JSON.parse(raw);
+    state.items = s.items || [];
+    state.meta = s.meta || {};
+    state.dynamicLegend = s.dynamicLegend || [];
+    state.selected = null;
+    setMeta(state.meta);
+    render();
+  }
+  function updateHistoryBtns() {
+    document.getElementById('undoBtn').disabled = !undoStack.length;
+    document.getElementById('redoBtn').disabled = !redoStack.length;
+  }
+
+  // === THƯ VIỆN ===
+  function loadCustomLibrary() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(CUSTOM_LIBRARY_KEY) || '[]');
+      customLibrary = Array.isArray(raw) ? raw.filter(x => x && x.id && x.label) : [];
+    } catch (_) {
+      customLibrary = [];
+    }
+    try {
+      const hidden = JSON.parse(localStorage.getItem(HIDDEN_LIBRARY_KEY) || '[]');
+      const validTypes = new Set(TYPES.map(t => t.type));
+      hiddenLibraryTypes = Array.isArray(hidden) ? hidden.filter(type => validTypes.has(type)) : [];
+    } catch (_) {
+      hiddenLibraryTypes = [];
+    }
+  }
+
+  function saveCustomLibrary() {
+    localStorage.setItem(CUSTOM_LIBRARY_KEY, JSON.stringify(customLibrary));
+  }
+
+  function saveHiddenLibrary() {
+    localStorage.setItem(HIDDEN_LIBRARY_KEY, JSON.stringify(hiddenLibraryTypes));
+  }
+
+  function setLibraryDeleteMode(on) {
+    libraryDeleteMode = !!on;
+    library.classList.toggle('delete-mode', libraryDeleteMode);
+    const btn = document.getElementById('deleteLibraryBtn');
+    if (btn) {
+      btn.classList.toggle('active', libraryDeleteMode);
+      btn.textContent = libraryDeleteMode ? '− Đang xóa' : '− Xóa';
+    }
+  }
+
+  function libraryIconSvg(type, customId = '') {
+    const common = 'viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+    const icons = {
+      special: `<svg ${common}><rect x="6" y="10" width="12" height="10" rx="2"/><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10"/></svg>`,
+      otc: `<svg ${common}><path d="M7.2 16.8a4 4 0 0 1 0-5.6l4-4a4 4 0 0 1 5.6 5.6l-4 4a4 4 0 0 1-5.6 0Z"/><path d="m9.2 9.2 5.6 5.6"/></svg>`,
+      rx: `<svg ${common}><path d="M6 5v14M6 5h5a4 4 0 0 1 0 8H6m5 0 6 6m0-6-6 6"/></svg>`,
+      supplement: `<svg ${common}><rect x="7" y="5" width="10" height="15" rx="2"/><path d="M9 5V3h6v2M9 10h6M9 14h6"/></svg>`,
+      cosmetic: `<svg ${common}><path d="m12 3 1.3 4.2L17.5 8.5l-4.2 1.3L12 14l-1.3-4.2-4.2-1.3 4.2-1.3L12 3Z"/><path d="m18 14 .7 2.3L21 17l-2.3.7L18 20l-.7-2.3L15 17l2.3-.7L18 14Z"/></svg>`,
+      device: `<svg ${common}><path d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5V4Z"/></svg>`,
+      aircon: `<svg ${common}><rect x="3" y="5" width="18" height="8" rx="2"/><path d="M6 9h12M8 17c1-2 2-2 3-4m5 4c-1-2-2-2-3-4"/></svg>`,
+      counter: `<svg ${common}><path d="M4 8h16v11H4zM4 12h16M8 19v2m8-2v2"/></svg>`,
+      consult: `<svg ${common}><path d="M4 10h16M6 10v8m12-8v8M8 6h8v4"/></svg>`,
+      fridge: `<svg ${common}><rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 10h12M9 6v2m0 5v3"/></svg>`,
+      thermo: `<svg ${common}><path d="M10 5a2 2 0 0 1 4 0v9.2a4 4 0 1 1-4 0V5Z"/><path d="M12 8v8"/></svg>`,
+      computer: `<svg ${common}><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8m-4-4v4"/></svg>`,
+      records: `<svg ${common}><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M5 10h14M9 7h6m-6 7h6"/></svg>`,
+      door: `<svg ${common}><path d="M6 21V4h11v17M6 21h13"/><circle cx="14" cy="13" r=".7" fill="currentColor" stroke="none"/></svg>`,
+      shelf: `<svg ${common}><rect x="4" y="3" width="16" height="18"/><path d="M4 9h16M4 15h16M9 3v18"/></svg>`,
+      pickup: `<svg ${common}><path d="M4 7h12l4 5-8 8-8-8V7Z"/><circle cx="8" cy="11" r="1"/></svg>`,
+      printer: `<svg ${common}><path d="M7 8V3h10v5M6 17H4V9h16v8h-2M7 14h10v7H7z"/><path d="M17 11h.01"/></svg>`,
+      info: `<svg ${common}><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/></svg>`,
+      custom: `<svg ${common}><path d="M4 20h4l10-10-4-4L4 16v4Z"/><path d="m12.5 7.5 4 4"/></svg>`
+    };
+    if (customId) return `<svg ${common}><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M12 8v8M8 12h8"/></svg>`;
+    return icons[type] || icons.custom;
+  }
+
+  function addLibraryElement({ type, label, customId = '' }) {
+    const el = document.createElement('div');
+    el.className = 'lib-item' + (customId ? ' user-library' : '');
+    el.draggable = !libraryDeleteMode;
+    el.dataset.type = type;
+    if (customId) el.dataset.customId = customId;
+    const icon = document.createElement('span');
+    icon.className = 'lib-icon';
+    icon.innerHTML = libraryIconSvg(type, customId);
+    const text = document.createElement('span');
+    text.className = 'lib-label';
+    text.textContent = label;
+    el.append(icon, text);
+
+    el.addEventListener('dragstart', e => {
+      if (libraryDeleteMode) { e.preventDefault(); return; }
+      const payload = customId ? `customlib:${customId}` : type;
+      e.dataTransfer.setData('text/plain', payload);
+      e.dataTransfer.effectAllowed = 'copy';
+    });
+
+    el.addEventListener('click', e => {
+      if (!libraryDeleteMode) return;
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (customId) {
+        const entry = customLibrary.find(x => x.id === customId);
+        if (!entry) return;
+        customLibrary = customLibrary.filter(x => x.id !== customId);
+        saveCustomLibrary();
+      } else {
+        const entry = TYPES.find(x => x.type === type);
+        if (!entry) return;
+        if (!hiddenLibraryTypes.includes(type)) hiddenLibraryTypes.push(type);
+        saveHiddenLibrary();
+      }
+
+      setLibraryDeleteMode(false);
+      makeLibrary();
+      showToast('Đã xóa nút khỏi thư viện');
+    });
+
+    el.addEventListener('dblclick', () => {
+      if (libraryDeleteMode) return;
+      let displayName = null;
+      let itemType = type;
+      if (customId) {
+        itemType = 'custom';
+        displayName = label;
+      } else if (type === 'custom' || type === 'info') {
+        const isInfo = type === 'info';
+        const name = prompt(isInfo ? 'Nội dung nút thông tin:' : 'Tên chức năng:', isInfo ? 'Thông tin' : 'Chức năng của tôi');
+        if (name === null) return;
+        displayName = name.trim() || (isInfo ? 'Thông tin' : 'Chức năng');
+      }
+      pushHistory();
+      addItem(itemType, 50, 50, displayName);
+      showToast('Đã thêm ' + (displayName || label));
+    });
+
+    library.appendChild(el);
+  }
+
+  function makeLibrary() {
+    library.innerHTML = '';
+    const visibleBuiltins = TYPES.filter(t => !hiddenLibraryTypes.includes(t.type));
+    visibleBuiltins.forEach(t => addLibraryElement({ type: t.type, label: t.label }));
+    customLibrary.forEach(entry => addLibraryElement({
+      type: 'custom',
+      label: entry.label,
+      customId: entry.id
+    }));
+
+    const count = visibleBuiltins.length + customLibrary.length;
+    const cols = count > 28 ? 3 : 2;
+    const rows = Math.max(1, Math.ceil(Math.max(count, 1) / cols));
+    const font = count > 34 ? 6.5 : count > 26 ? 7.0 : count > 20 ? 7.6 : 8.3;
+    const gap = count > 28 ? 1.5 : 2.5;
+    const iconSize = count > 34 ? 8 : count > 26 ? 9 : count > 20 ? 10 : 12;
+    const iconGap = count > 28 ? 2 : 3;
+    library.style.setProperty('--library-cols', cols);
+    library.style.setProperty('--library-rows', rows);
+    library.style.setProperty('--library-font', font + 'px');
+    library.style.setProperty('--library-gap', gap + 'px');
+    library.style.setProperty('--library-icon', iconSize + 'px');
+    library.style.setProperty('--library-icon-gap', iconGap + 'px');
+    library.classList.toggle('delete-mode', libraryDeleteMode);
+  }
+
+
+  function addItem(type, x, y, displayName) {
+    const [w,h] = defaultSize(type);
+    const item = { id: uid(), type, x: x-w/2, y: y-h/2, w, h, r: 0 };
+    if (displayName) item.displayName = displayName;
+    clampItemToArea(item);
+    state.items.push(item);
+
+    const t = getType(type);
+    if (t && !t.main) {
+      const label = displayName || t.label;
+      state.dynamicLegend.push({ id: item.id, label });
+    }
+    state.selected = item.id;
+    render();
+    return item;
+  }
+
+  function deleteItemById(id) {
+    const item = state.items.find(i => i.id === id);
+    if (!item) return;
+    const idx = state.items.indexOf(item);
+    if (idx > -1) {
+      state.items.splice(idx, 1);
+      const t = getType(item.type);
+      if (t && !t.main) {
+        const legIdx = state.dynamicLegend.findIndex(d => d.id === id);
+        if (legIdx > -1) state.dynamicLegend.splice(legIdx, 1);
+      }
+      state.selected = null;
+      render();
+    }
+  }
+
+  function removeFromLegend(id) {
+    const legIdx = state.dynamicLegend.findIndex(d => d.id === id);
+    if (legIdx > -1) {
+      pushHistory();
+      state.dynamicLegend.splice(legIdx, 1);
+      const item = state.items.find(i => i.id === id);
+      if (item) delete item.displayName;
+      render();
+      showToast('Đã xoá khỏi chú thích, giữ vật thể');
+    }
+  }
+
+  function renderLegend() {
+    if (!legendEl) return;
+    let html = '';
+    const mains = TYPES.filter(t => t.main);
+    mains.forEach((t, idx) => {
+      html += `<div class="legend-item"><span>${idx+1}. ${t.label}</span></div>`;
+    });
+    state.dynamicLegend.forEach((item, idx) => {
+      const num = 8 + idx;
+      html += `<div class="legend-item">
+                <span>${num}. ${item.label}</span>
+                <button class="del-btn" data-id="${item.id}" title="Xoá khỏi chú thích">×</button>
+              </div>`;
+    });
+    legendEl.innerHTML = html;
+    legendEl.querySelectorAll('.del-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        removeFromLegend(btn.dataset.id);
+      });
+    });
+  }
+
+  // === RENDER CHÍNH ===
+  function render() {
+    drawArea.innerHTML = '';
+    state.items.forEach(item => {
+      const t = getType(item.type);
+      let label = item.displayName;
+      if (!label) {
+        const leg = state.dynamicLegend.find(d => d.id === item.id);
+        if (leg) label = leg.label;
+        else label = t ? t.label : '?';
+      }
+      const el = document.createElement('div');
+      el.className = 'draw-item';
+      if (item.id === state.selected) el.classList.add('selected');
+      if (['aircon','door','consult','special','fridge'].includes(item.type))
+        el.classList.add('is-'+item.type);
+      el.dataset.id = item.id;
+      el.style.left = item.x + '%';
+      el.style.top = item.y + '%';
+      el.style.width = item.w + '%';
+      el.style.height = item.h + '%';
+      el.style.transform = `rotate(${item.r}deg)`;
+      el.textContent = titleCaseLabel(label);
+
+      el.addEventListener('pointerdown', onItemPointerDown);
+      el.addEventListener('click', e => {
+        e.stopPropagation();
+        state.selected = item.id;
+        renderInspector();
+        selectOnly();
+      });
+      el.addEventListener('wheel', e => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (state.selected !== item.id) state.selected = item.id;
+        pushHistory();
+        let step = e.deltaY > 0 ? 5 : -5;
+        item.r = (item.r + step + 360) % 360;
+        const snaps = [0,90,180,270];
+        for (const s of snaps) {
+          let d = Math.abs(item.r - s);
+          if (d > 180) d = 360 - d;
+          if (d <= 3) { item.r = s; break; }
+        }
+        clampItemToArea(item);
+        render();
+      }, { passive: false });
+
+      drawArea.appendChild(el);
+    });
+    renderLegend();
+    renderInspector();
+    renderStatus();
+    updateHistoryBtns();
+  }
+
+  function selectOnly() {
+    [...drawArea.children].forEach(el =>
+      el.classList.toggle('selected', el.dataset.id === state.selected)
+    );
+  }
+
+  // === KÉO THẢ ===
+  function onItemPointerDown(e) {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    const id = e.currentTarget.dataset.id;
+    const item = state.items.find(i => i.id === id);
+    state.selected = id;
+    selectOnly();
+    renderInspector();
+
+    const rect = drawArea.getBoundingClientRect();
+    dragging = {
+      id,
+      startX: e.clientX,
+      startY: e.clientY,
+      origX: item.x,
+      origY: item.y,
+      moved: false,
+      rect,
+      saved: false
+    };
+    e.currentTarget.setPointerCapture(e.pointerId);
+    e.currentTarget.addEventListener('pointermove', onMove);
+    e.currentTarget.addEventListener('pointerup', onUp, { once: true });
+  }
+
+  function onMove(e) {
+    if (!dragging) return;
+    const item = state.items.find(i => i.id === dragging.id);
+    if (!item) return;
+    let dx = (e.clientX - dragging.startX) / dragging.rect.width * 100;
+    let dy = (e.clientY - dragging.startY) / dragging.rect.height * 100;
+    if (Math.abs(dx) + Math.abs(dy) > .1) dragging.moved = true;
+    if (dragging.moved && !dragging.saved) {
+      pushHistory();
+      dragging.saved = true;
+    }
+    item.x = dragging.origX + dx;
+    item.y = dragging.origY + dy;
+    clampItemToArea(item, dragging.rect);
+    const el = drawArea.querySelector(`[data-id="${item.id}"]`);
+    if (el) {
+      el.style.left = item.x + '%';
+      el.style.top = item.y + '%';
+    }
+  }
+
+  function onUp(e) {
+    e.currentTarget.removeEventListener('pointermove', onMove);
+    dragging = null;
+  }
+
+  // === DROP ===
+  drawArea.addEventListener('dragover', e => {
+    e.preventDefault();
+    drawArea.classList.add('dragover');
+  });
+  drawArea.addEventListener('dragleave', () => drawArea.classList.remove('dragover'));
+  drawArea.addEventListener('drop', e => {
+    e.preventDefault();
+    drawArea.classList.remove('dragover');
+    const payload = e.dataTransfer.getData('text/plain');
+    let type = payload;
+    let displayName = null;
+    if (payload.startsWith('customlib:')) {
+      const customId = payload.slice('customlib:'.length);
+      const entry = customLibrary.find(x => x.id === customId);
+      if (!entry) return;
+      type = 'custom';
+      displayName = entry.label;
+    }
+    if (!getType(type)) return;
+    const rect = drawArea.getBoundingClientRect();
+    if (type === 'custom' && !displayName) {
+      const name = prompt('Tên chức năng:', 'Chức năng của tôi');
+      if (name === null) return;
+      displayName = name.trim() || 'Chức năng';
+    }
+    pushHistory();
+    addItem(type,
+      (e.clientX - rect.left) / rect.width * 100,
+      (e.clientY - rect.top) / rect.height * 100,
+      displayName
+    );
+  });
+  drawArea.addEventListener('click', () => {
+    state.selected = null;
+    selectOnly();
+    renderInspector();
+  });
+
+  // === INSPECTOR ===
+  function renderInspector() {
+    const item = state.items.find(i => i.id === state.selected);
+    if (!item) {
+      inspector.className = 'inspector empty';
+      inspector.innerHTML = 'Chọn vật thể để chỉnh';
+      return;
+    }
+    const t = getType(item.type);
+    const isDynamic = t && !t.main;
+    const legIndex = isDynamic ? state.dynamicLegend.findIndex(d => d.id === item.id) : -1;
+
+    let html = `<div style="font-weight:700;margin-bottom:4px;">${t ? t.label : '?'}</div>`;
+
+    if (isDynamic) {
+      html += `<div class="field"><label>Tên hiển thị</label>
+                <input id="displayNameInput" type="text" value="${item.displayName || (legIndex>-1 ? state.dynamicLegend[legIndex].label : '')}" style="width:100%;border:1px solid var(--line);border-radius:6px;padding:4px 6px;font-size:12px;"></div>`;
+    }
+
+    html += `
+      <div class="field"><label><span>Ngang</span><span>Ngắn ↔ Dài</span></label><input id="wRange" type="range" min="6" max="40" step="1" value="${item.w}"></div>
+      <div class="field"><label><span>Dọc</span><span>Thấp ↔ Cao</span></label><input id="hRange" type="range" min="5" max="32" step="1" value="${item.h}"></div>
+      <div class="mini-actions">
+        <button class="btn" id="copyItem">⧉ Copy</button>
+        <button class="btn danger" id="deleteItem">🗑 Xóa</button>
+      </div>
+      <button class="btn" id="rotate90" style="width:100%;margin-top:6px;">↻ Xoay 90°</button>
+    `;
+
+    if (isDynamic && legIndex > -1) {
+      html += `
+        <div style="margin-top:8px;border-top:1px solid var(--line);padding-top:8px;display:flex;gap:4px;align-items:center;justify-content:space-between;font-size:11px;">
+          <span>Thứ tự: ${8+legIndex}</span>
+          <div>
+            <button class="btn" id="moveUpBtn" ${legIndex===0?'disabled':''} style="padding:2px 8px;">▲</button>
+            <button class="btn" id="moveDownBtn" ${legIndex===state.dynamicLegend.length-1?'disabled':''} style="padding:2px 8px;">▼</button>
+          </div>
+          <button class="btn" id="removeFromLegendBtn" style="color:var(--danger);border-color:var(--danger);padding:2px 8px;">× chú thích</button>
+        </div>
+      `;
+    }
+
+    inspector.className = 'inspector';
+    inspector.innerHTML = html;
+
+    const wr = document.getElementById('wRange'), hr = document.getElementById('hRange');
+    let hist = false;
+    const start = () => { if (!hist) { pushHistory(); hist = true; } };
+    wr.addEventListener('pointerdown', start);
+    hr.addEventListener('pointerdown', start);
+    wr.addEventListener('input', () => {
+      item.w = +wr.value;
+      clampItemToArea(item);
+      renderItemOnly(item);
+    });
+    hr.addEventListener('input', () => {
+      item.h = +hr.value;
+      clampItemToArea(item);
+      renderItemOnly(item);
+    });
+    wr.addEventListener('change', () => { hist = false; });
+    hr.addEventListener('change', () => { hist = false; });
+
+    document.getElementById('copyItem').onclick = () => {
+      pushHistory();
+      const c = { ...item, id: uid(), x: item.x + 3, y: item.y + 3 };
+      const tc = getType(c.type);
+      if (tc && !tc.main) {
+        const label = item.displayName || (state.dynamicLegend.find(d => d.id === item.id)?.label || tc.label);
+        c.displayName = label;
+        clampItemToArea(c);
+        state.items.push(c);
+        state.dynamicLegend.push({ id: c.id, label });
+      } else {
+        clampItemToArea(c);
+        state.items.push(c);
+      }
+      state.selected = c.id;
+      render();
+      showToast('Đã copy');
+    };
+
+    document.getElementById('deleteItem').onclick = () => {
+      pushHistory();
+      deleteItemById(item.id);
+    };
+
+    document.getElementById('rotate90').onclick = () => {
+      pushHistory();
+      item.r = (item.r + 90) % 360;
+      clampItemToArea(item);
+      render();
+    };
+
+    if (isDynamic) {
+      const nameInput = document.getElementById('displayNameInput');
+      if (nameInput) {
+        nameInput.addEventListener('input', () => {
+          const newName = nameInput.value.trim() || 'Chức năng';
+          const leg = state.dynamicLegend.find(d => d.id === item.id);
+          if (leg) {
+            leg.label = newName;
+            item.displayName = newName;
+            pushHistory();
+            render();
+          }
+        });
+      }
+
+      const upBtn = document.getElementById('moveUpBtn');
+      const downBtn = document.getElementById('moveDownBtn');
+      if (upBtn) {
+        upBtn.addEventListener('click', () => {
+          const idx = state.dynamicLegend.findIndex(d => d.id === item.id);
+          if (idx > 0) {
+            pushHistory();
+            [state.dynamicLegend[idx-1], state.dynamicLegend[idx]] = [state.dynamicLegend[idx], state.dynamicLegend[idx-1]];
+            render();
+          }
+        });
+      }
+      if (downBtn) {
+        downBtn.addEventListener('click', () => {
+          const idx = state.dynamicLegend.findIndex(d => d.id === item.id);
+          if (idx < state.dynamicLegend.length - 1) {
+            pushHistory();
+            [state.dynamicLegend[idx+1], state.dynamicLegend[idx]] = [state.dynamicLegend[idx], state.dynamicLegend[idx+1]];
+            render();
+          }
+        });
+      }
+
+      const removeBtn = document.getElementById('removeFromLegendBtn');
+      if (removeBtn) {
+        removeBtn.addEventListener('click', () => {
+          removeFromLegend(item.id);
+        });
+      }
+    }
+  }
+
+  function renderItemOnly(item) {
+    const el = drawArea.querySelector(`[data-id="${item.id}"]`);
+    if (el) {
+      el.style.left = item.x + '%';
+      el.style.top = item.y + '%';
+      el.style.width = item.w + '%';
+      el.style.height = item.h + '%';
+      el.style.transform = `rotate(${item.r}deg)`;
+    }
+  }
+
+  // === TRẠNG THÁI ===
+  function renderStatus() {
+    const mains = TYPES.filter(t => t.main);
+    let count = 0;
+    statusList.innerHTML = '';
+    mains.forEach(t => {
+      const ok = state.items.some(i => i.type === t.type);
+      if (ok) count++;
+      const row = document.createElement('div');
+      row.className = 'status-row' + (ok ? ' ok' : '');
+      row.innerHTML = `<span>${ok ? '✓' : '○'}</span><span>${t.label}</span>`;
+      statusList.appendChild(row);
+    });
+    statusHead.textContent = `${count}/7`;
+  }
+
+  // === META ===
+  function getMeta() {
+    const ids = ['business','address','manager','area','placeLocation','placeDay','placeMonth','placeYear','signerName'];
+    const m = {};
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) m[id] = el.value;
+    });
+    return m;
+  }
+  function setMeta(m) {
+    Object.keys(m||{}).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = m[id] || '';
+    });
+  }
+
+  // === Xóa tất cả meta (reset) ===
+  function resetMeta() {
+    const ids = ['business','address','manager','area','placeLocation','placeDay','placeMonth','placeYear','signerName'];
+    ids.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    state.meta = {};
+  }
+
+  // === Lưu / tải ===
+  const QUICK_SAVE_KEY = 'gpp-drawing-v1';
+  const SAVED_PLANS_KEY = 'gpp-saved-plans-v1';
+
+  function currentStateData() {
+    state.meta = getMeta();
+    return {
+      items: state.items,
+      meta: state.meta,
+      dynamicLegend: state.dynamicLegend
+    };
+  }
+
+  function saveLocal(show = true) {
+    localStorage.setItem(QUICK_SAVE_KEY, JSON.stringify(currentStateData()));
+    if (show) showToast('Đã lưu nhanh');
+  }
+
+  function getSavedPlans() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(SAVED_PLANS_KEY) || '{}');
+      return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  function setSavedPlans(plans) {
+    localStorage.setItem(SAVED_PLANS_KEY, JSON.stringify(plans));
+  }
+
+  function refreshSavedPlans(preferName = '') {
+    const select = document.getElementById('savedPlanSelect');
+    if (!select) return;
+    const plans = getSavedPlans();
+    const names = Object.keys(plans).sort((a,b) => (plans[b].updatedAt || '').localeCompare(plans[a].updatedAt || ''));
+    select.innerHTML = names.length ? '' : '<option value="">— Chưa có sơ đồ —</option>';
+    names.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      const date = plans[name].updatedAt ? new Date(plans[name].updatedAt).toLocaleString('vi-VN') : '';
+      opt.textContent = date ? `${name} · ${date}` : name;
+      select.appendChild(opt);
+    });
+    if (preferName && plans[preferName]) select.value = preferName;
+  }
+
+  function saveNamedPlan() {
+    const select = document.getElementById('savedPlanSelect');
+    const suggested = select && select.value ? select.value : ((document.getElementById('business').value || '').trim() || 'Sơ đồ mới');
+    const input = prompt('Đặt tên sơ đồ để lần sau mở lại:', suggested);
+    if (input === null) return;
+    const name = input.trim();
+    if (!name) { showToast('Vui lòng nhập tên sơ đồ'); return; }
+    const plans = getSavedPlans();
+    if (plans[name] && !confirm(`Sơ đồ “${name}” đã tồn tại. Ghi đè bản cũ?`)) return;
+    plans[name] = { ...currentStateData(), updatedAt: new Date().toISOString() };
+    setSavedPlans(plans);
+    saveLocal(false);
+    refreshSavedPlans(name);
+    showToast('Đã lưu sơ đồ: ' + name);
+  }
+
+  function loadNamedPlan() {
+    const select = document.getElementById('savedPlanSelect');
+    const name = select && select.value;
+    if (!name) { showToast('Chưa chọn sơ đồ'); return; }
+    const plans = getSavedPlans();
+    const saved = plans[name];
+    if (!saved) { refreshSavedPlans(); showToast('Không tìm thấy bản lưu'); return; }
+    if ((state.items.length || Object.values(getMeta()).some(v => v !== '')) && !confirm(`Mở “${name}”? Nội dung đang chỉnh trên màn hình sẽ được thay thế.`)) return;
+    pushHistory();
+    state.items = Array.isArray(saved.items) ? JSON.parse(JSON.stringify(saved.items)) : [];
+    state.meta = saved.meta && typeof saved.meta === 'object' ? JSON.parse(JSON.stringify(saved.meta)) : {};
+    state.dynamicLegend = Array.isArray(saved.dynamicLegend) ? JSON.parse(JSON.stringify(saved.dynamicLegend)) : [];
+    state.selected = null;
+    setMeta(state.meta);
+    render();
+    showToast('Đã mở sơ đồ: ' + name);
+  }
+
+  function deleteNamedPlan() {
+    const select = document.getElementById('savedPlanSelect');
+    const name = select && select.value;
+    if (!name) { showToast('Chưa chọn bản lưu'); return; }
+    if (!confirm(`Xóa bản lưu “${name}”? Sơ đồ đang mở trên màn hình vẫn được giữ.`)) return;
+    const plans = getSavedPlans();
+    delete plans[name];
+    setSavedPlans(plans);
+    refreshSavedPlans();
+    showToast('Đã xóa bản lưu');
+  }
+
+  // Không tự động phục hồi khi khởi động: người dùng chủ động chọn sơ đồ cần mở.
+
+  // === SỰ KIỆN ===
+  ['business','address','manager','area','placeLocation','placeDay','placeMonth','placeYear','signerName'].forEach(id =>
+    document.getElementById(id).addEventListener('input', () => {
+      // không tự động lưu, chỉ lưu khi nhấn nút Lưu
+    })
+  );
+
+  document.getElementById('saveBtn').onclick = () => saveLocal(true);
+  document.getElementById('savePlanBtn').onclick = saveNamedPlan;
+  document.getElementById('loadPlanBtn').onclick = loadNamedPlan;
+  document.getElementById('deletePlanBtn').onclick = deleteNamedPlan;
+
+  document.getElementById('addLibraryBtn').onclick = () => {
+    setLibraryDeleteMode(false);
+    const name = prompt('Tên nút mới trong thư viện:', 'Nút mới');
+    if (name === null) return;
+    const label = name.trim();
+    if (!label) { showToast('Vui lòng nhập tên nút'); return; }
+    if (customLibrary.some(x => x.label.toLowerCase() === label.toLowerCase())) {
+      showToast('Tên nút này đã có trong thư viện');
+      return;
+    }
+    customLibrary.push({ id: 'lib' + Date.now().toString(36), label });
+    saveCustomLibrary();
+    makeLibrary();
+    showToast('Đã tạo nút thư viện: ' + label);
+  };
+
+  document.getElementById('deleteLibraryBtn').onclick = () => {
+    const visibleBuiltins = TYPES.filter(t => !hiddenLibraryTypes.includes(t.type));
+    if (!visibleBuiltins.length && !customLibrary.length) {
+      showToast('Thư viện không còn nút để xóa');
+      return;
+    }
+    setLibraryDeleteMode(!libraryDeleteMode);
+    if (libraryDeleteMode) showToast('Chọn bất kỳ nút nào trong thư viện để xóa');
+  };
+
+  document.getElementById('restoreLibraryBtn').onclick = () => {
+    setLibraryDeleteMode(false);
+    if (!hiddenLibraryTypes.length) {
+      showToast('Các nút mặc định đang đầy đủ');
+      return;
+    }
+    hiddenLibraryTypes = [];
+    saveHiddenLibrary();
+    makeLibrary();
+    showToast('Đã khôi phục các nút mặc định');
+  };
+
+  document.getElementById('printBtn').onclick = () => {
+    state.selected = null;
+    selectOnly();
+    renderInspector();
+    saveLocal(false);
+    setTimeout(() => window.print(), 60);
+  };
+
+  document.getElementById('clearBtn').onclick = () => {
+    if (!state.items.length && !Object.values(getMeta()).some(v => v !== '')) {
+      showToast('Đã sạch sẽ');
+      return;
+    }
+    if (confirm('Xóa toàn bộ sơ đồ và dữ liệu đã nhập?')) {
+      pushHistory();
+      state.items = [];
+      state.dynamicLegend = [];
+      state.selected = null;
+      resetMeta();      // xóa hết nội dung nhập
+      render();
+      showToast('Đã xóa tất cả');
+    }
+  };
+
+  document.getElementById('undoBtn').onclick = () => {
+    if (!undoStack.length) return;
+    redoStack.push(snapshot());
+    restore(undoStack.pop());
+  };
+  document.getElementById('redoBtn').onclick = () => {
+    if (!redoStack.length) return;
+    undoStack.push(snapshot());
+    restore(redoStack.pop());
+  };
+
+  document.addEventListener('keydown', e => {
+    const active = document.activeElement;
+    if (active && ['INPUT','TEXTAREA'].includes(active.tagName)) return;
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); document.getElementById('undoBtn').click(); }
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); document.getElementById('redoBtn').click(); }
+    if ((e.ctrlKey||e.metaKey) && e.key.toLowerCase() === 'c' && state.selected) { e.preventDefault(); document.getElementById('copyItem')?.click(); }
+    if ((e.key === 'Delete' || e.key === 'Backspace') && state.selected) { e.preventDefault(); document.getElementById('deleteItem')?.click(); }
+  });
+
+  // === PWA: CÀI ĐẶT / CẬP NHẬT ===
+  const installBtn = document.getElementById('installBtn');
+  const updateBtn = document.getElementById('updateBtn');
+  const updatePanel = document.getElementById('updatePanel');
+  const applyUpdateBtn = document.getElementById('applyUpdateBtn');
+  const laterUpdateBtn = document.getElementById('laterUpdateBtn');
+
+  let deferredInstallPrompt = null;
+  let swRegistration = null;
+  let refreshingForUpdate = false;
+
+  function isStandaloneMode() {
+    return window.matchMedia('(display-mode: standalone)').matches ||
+           window.navigator.standalone === true;
+  }
+
+
+  function refreshInstallButton() {
+    if (!installBtn) return;
+    // Chỉ hiện khi trình duyệt đã xác nhận app đủ điều kiện cài đặt.
+    // Nhờ vậy bấm Cài đặt luôn mở hộp cài thật, không hiện hộp hướng dẫn giả.
+    const canInstall = !!deferredInstallPrompt && !isStandaloneMode();
+    installBtn.hidden = !canInstall;
+    installBtn.classList.toggle('attention', canInstall);
+  }
+
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredInstallPrompt = e;
+    refreshInstallButton();
+    if (!sessionStorage.getItem('gpp-install-reminded')) {
+      sessionStorage.setItem('gpp-install-reminded', '1');
+      setTimeout(() => showToast('Có thể cài GPP Sơ đồ lên máy'), 1200);
+    }
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredInstallPrompt = null;
+    localStorage.setItem('gpp-pwa-installed', '1');
+    refreshInstallButton();
+    showToast('Đã cài GPP Sơ đồ');
+  });
+
+  installBtn?.addEventListener('click', async () => {
+    if (!deferredInstallPrompt) {
+      refreshInstallButton();
+      return;
+    }
+
+    const promptEvent = deferredInstallPrompt;
+    deferredInstallPrompt = null;
+    refreshInstallButton();
+
+    try {
+      await promptEvent.prompt();
+      const result = await promptEvent.userChoice;
+      if (result.outcome === 'accepted') {
+        showToast('Đã xác nhận cài đặt');
+      }
+    } catch (err) {
+      console.error('Không thể mở hộp cài PWA:', err);
+    }
+  });
+
+  function showUpdateAvailable(reg) {
+    swRegistration = reg || swRegistration;
+    if (updateBtn) updateBtn.hidden = false;
+    if (updatePanel && !sessionStorage.getItem('gpp-update-deferred')) {
+      updatePanel.hidden = false;
+    }
+  }
+
+  function applyWaitingUpdate() {
+    if (!swRegistration?.waiting) {
+      swRegistration?.update?.();
+      showToast('Đang kiểm tra bản mới');
+      return;
+    }
+    refreshingForUpdate = true;
+    swRegistration.waiting.postMessage({ type: 'SKIP_WAITING' });
+  }
+
+  updateBtn?.addEventListener('click', () => {
+    sessionStorage.removeItem('gpp-update-deferred');
+    if (swRegistration?.waiting) updatePanel.hidden = false;
+    else swRegistration?.update?.();
+  });
+
+  applyUpdateBtn?.addEventListener('click', applyWaitingUpdate);
+  laterUpdateBtn?.addEventListener('click', () => {
+    updatePanel.hidden = true;
+    sessionStorage.setItem('gpp-update-deferred', '1');
+    showToast('Nút Cập nhật vẫn được giữ trên thanh công cụ');
+  });
+
+  if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshingForUpdate) window.location.reload();
+    });
+
+    window.addEventListener('load', async () => {
+      try {
+        const reg = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+        swRegistration = reg;
+
+        if (reg.waiting && navigator.serviceWorker.controller) showUpdateAvailable(reg);
+
+        reg.addEventListener('updatefound', () => {
+          const worker = reg.installing;
+          if (!worker) return;
+          worker.addEventListener('statechange', () => {
+            if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+              showUpdateAvailable(reg);
+            }
+          });
+        });
+
+        // Kiểm tra khi quay lại ứng dụng + định kỳ để người dùng không bỏ lỡ bản cập nhật.
+        document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') reg.update().catch(() => {});
+        });
+        window.addEventListener('focus', () => reg.update().catch(() => {}));
+        setInterval(() => reg.update().catch(() => {}), 30 * 60 * 1000);
+      } catch (err) {
+        console.warn('Không thể đăng ký Service Worker:', err);
+      }
+    });
+  }
+
+  refreshInstallButton();
+
+  // === KHỞI TẠO (trang trống) ===
+  loadCustomLibrary();
+  makeLibrary();
+  refreshSavedPlans();
+  // KHÔNG tự mở bản lưu -> người dùng chủ động chọn sơ đồ cần mở
+  state.items = [];
+  state.dynamicLegend = [];
+  resetMeta();
+  render();
+  updateHistoryBtns();
+})();
+</script>
+</body>
+</html>

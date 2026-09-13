@@ -1,0 +1,20 @@
+{
+  "id": "./",
+  "name": "Trợ lý vẽ sơ đồ GPP",
+  "short_name": "GPP Sơ đồ",
+  "description": "Trợ lý kéo thả để vẽ sơ đồ bố trí cơ sở bán lẻ thuốc GPP.",
+  "lang": "vi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#f2f5f9",
+  "theme_color": "#1a5cff",
+  "orientation": "any",
+  "icons": [
+    {"src":"./icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"./icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"./icons/icon-maskable-192.png","sizes":"192x192","type":"image/png","purpose":"maskable"},
+    {"src":"./icons/icon-maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ]
+}

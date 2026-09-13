@@ -1,0 +1,73 @@
+{
+  "id": "./",
+  "name": "CÔNG VIỆC",
+  "short_name": "CÔNG VIỆC",
+  "description": "Trung tâm các phần mềm phục vụ công việc",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f7fb",
+  "theme_color": "#8ec9e6",
+  "icons": [
+    {
+      "src": "./assets/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./assets/app-icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./assets/app-icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nén PDF",
+      "short_name": "Nén PDF",
+      "url": "./index.html#nen-pdf",
+      "icons": [
+        {
+          "src": "./assets/app-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Tạo Nhãn Thuốc",
+      "short_name": "Nhãn Thuốc",
+      "url": "./index.html#nhan-thuoc",
+      "icons": [
+        {
+          "src": "./assets/app-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Vẽ Sơ Đồ Cơ Sở",
+      "short_name": "Sơ Đồ",
+      "url": "./index.html#so-do-co-so",
+      "icons": [
+        {
+          "src": "./assets/app-icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

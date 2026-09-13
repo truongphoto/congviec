@@ -1,0 +1,35 @@
+[
+  {
+    "id": "nen-pdf",
+    "name": "Nén PDF",
+    "desc": "Nén PDF trực tiếp trên trình duyệt",
+    "url": "apps/nen-pdf/index.html",
+    "iconType": "text",
+    "icon": "PDF",
+    "accent": "#dc2626"
+  },
+  {
+    "id": "qr-tham-dinh",
+    "name": "QR Chỉ Dẫn",
+    "desc": "Tạo chỉ dẫn địa điểm phục vụ thẩm định",
+    "url": "apps/qr-tham-dinh/index.html",
+    "iconType": "image",
+    "icon": "apps/qr-tham-dinh/assets/app-icon-192.png"
+  },
+  {
+    "id": "nhan-thuoc",
+    "name": "Tạo Nhãn Thuốc",
+    "desc": "In nhãn ra lẻ và nhãn bảo quản thuốc",
+    "url": "apps/nhan-thuoc/index.html",
+    "iconType": "image",
+    "icon": "apps/nhan-thuoc/icon-192.png"
+  },
+  {
+    "id": "so-do-co-so",
+    "name": "Vẽ Sơ Đồ Cơ Sở",
+    "desc": "Trợ lý vẽ sơ đồ GPP / sơ đồ cơ sở",
+    "url": "apps/so-do-co-so/index.html",
+    "iconType": "image",
+    "icon": "apps/so-do-co-so/icons/icon-192.png"
+  }
+]
