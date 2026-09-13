@@ -1,4 +1,4 @@
-// CÔNG VIỆC v2.2 - cache-first, cập nhật thủ công.
+// CÔNG VIỆC v2.4 - cache-first, cập nhật thủ công.
 // Giữ CACHE_NAME ổn định qua các bản phát hành thông thường để tránh tải lại toàn bộ file.
 const CACHE_NAME = 'cong-viec-runtime-v1';
 const PRECACHE = [
@@ -8,6 +8,7 @@ const PRECACHE = [
   './manifest.webmanifest',
   './assets/app-icon-32.png',
   './assets/app-icon-192.png',
+  './assets/app-icon-512.png',
   './assets/apple-touch-icon.png'
 ];
 

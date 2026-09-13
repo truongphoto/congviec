@@ -2,7 +2,7 @@
   "id": "./",
   "name": "CÔNG VIỆC",
   "short_name": "CÔNG VIỆC",
-  "description": "Trung tâm các phần mềm phục vụ công việc",
+  "description": "CÔNG VIỆC - Trung tâm công cụ GPP",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -48,6 +48,18 @@
       ]
     },
     {
+      "name": "QR Chỉ Dẫn",
+      "short_name": "QR Chỉ Dẫn",
+      "url": "./index.html#qr-tham-dinh",
+      "icons": [
+        {
+          "src": "./assets/app-icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
       "name": "Tạo Nhãn Thuốc",
       "short_name": "Nhãn Thuốc",
       "url": "./index.html#nhan-thuoc",
@@ -69,5 +81,13 @@
         }
       ]
     }
+  ],
+  "lang": "vi",
+  "dir": "ltr",
+  "prefer_related_applications": false,
+  "display_override": [
+    "standalone",
+    "minimal-ui",
+    "browser"
   ]
 }

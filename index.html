@@ -36,7 +36,7 @@
 <aside class="sidebar" id="sidebar">
   <div class="brand"><img src="assets/app-icon-192.png" alt=""><div><strong>CÔNG VIỆC</strong><small>Trung tâm phần mềm</small></div></div>
   <div class="nav" id="nav"></div>
-  <div class="footer">Tác giả: Ngô Quang Trường (TRƯỜNG GPP) Liên Hệ : 0829076979<br><span class="version">Phiên bản 2.2</span></div>
+  <div class="footer">Tác giả: Ngô Quang Trường (TRƯỜNG GPP) Liên Hệ : 0829076979<br><span class="version">Phiên bản 2.4</span></div>
 </aside>
 <main class="main">
   <header class="topbar">
@@ -67,6 +67,16 @@
     <div class="modalActions"><button class="primaryBtn" id="closeIos">Đã hiểu</button></div>
   </div>
 </div>
+<div class="modalBack hidden" id="cocCocModal" role="dialog" aria-modal="true" aria-labelledby="cocCocTitle">
+  <div class="modal">
+    <h3 id="cocCocTitle">Cài CÔNG VIỆC trên Cốc Cốc</h3>
+    <p id="cocCocHelp">Cốc Cốc chưa mở hộp cài tự động. Hãy mở Menu Cốc Cốc và chọn chức năng cài ứng dụng hoặc tạo lối tắt cho trang này.</p>
+    <div class="modalActions">
+      <button class="actionBtn" id="closeCocCoc">Đóng</button>
+      <button class="primaryBtn" id="cocCocDone">Tôi đã cài xong</button>
+    </div>
+  </div>
+</div>
 <script>
 const FALLBACK_APPS=[
  {id:'nen-pdf',name:'Nén PDF',desc:'Nén PDF trực tiếp trên trình duyệt',url:'apps/nen-pdf/index.html',iconType:'text',icon:'PDF'},
@@ -74,7 +84,7 @@ const FALLBACK_APPS=[
  {id:'nhan-thuoc',name:'Tạo Nhãn Thuốc',desc:'In nhãn ra lẻ và nhãn bảo quản thuốc',url:'apps/nhan-thuoc/index.html',iconType:'image',icon:'apps/nhan-thuoc/icon-192.png'},
  {id:'so-do-co-so',name:'Vẽ Sơ Đồ Cơ Sở',desc:'Trợ lý vẽ sơ đồ GPP / sơ đồ cơ sở',url:'apps/so-do-co-so/index.html',iconType:'image',icon:'apps/so-do-co-so/icons/icon-192.png'}
 ];
-const CURRENT_VERSION='2.2.0';
+const CURRENT_VERSION='2.4.0';
 let APPS=[];
 let deferredInstallPrompt=null;
 let swRegistration=null;
@@ -84,6 +94,28 @@ const cards=document.getElementById('cards'),nav=document.getElementById('nav'),
 function showToast(message,ms=2600){clearTimeout(toastTimer);toast.textContent=message;toast.classList.add('show');toastTimer=setTimeout(()=>toast.classList.remove('show'),ms)}
 function isStandalone(){return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true}
 function isIOS(){return /iphone|ipad|ipod/i.test(navigator.userAgent)}
+function isAndroid(){return /android/i.test(navigator.userAgent)}
+function isCocCoc(){return /coc_coc_browser|coccoc/i.test(navigator.userAgent)}
+function isEdge(){return /edg\//i.test(navigator.userAgent)}
+function isChrome(){return !isEdge() && !isCocCoc() && /(chrome|crios)\//i.test(navigator.userAgent)}
+function browserLabel(){if(isCocCoc())return 'Cốc Cốc';if(isEdge())return 'Microsoft Edge';if(isChrome())return 'Google Chrome';return 'trình duyệt này'}
+function markInstalled(){try{localStorage.setItem('cong-viec-installed','1')}catch(_){}}
+function clearInstalledMark(){try{localStorage.removeItem('cong-viec-installed')}catch(_){}}
+function wasMarkedInstalled(){try{return localStorage.getItem('cong-viec-installed')==='1'}catch(_){return false}}
+function hideInstallButton(){installBtn.hidden=true}
+function hideUpdateButtonForSession(){try{sessionStorage.setItem('cong-viec-update-done',CURRENT_VERSION)}catch(_){} updateBtn.hidden=true}
+function restoreUpdateButton(){updateBtn.hidden=false;updateBtn.disabled=false;updateBtn.innerHTML='↻ <span class="updateText">Cập nhật</span>'}
+function syncActionButtons(){
+  // v2.4: Chrome / Edge / Cốc Cốc đều có nút Cài đặt khi chưa cài.
+  installBtn.hidden = isStandalone() || wasMarkedInstalled();
+  if(sessionStorage.getItem('cong-viec-update-done')===CURRENT_VERSION) updateBtn.hidden=true;
+  const justUpdated=sessionStorage.getItem('cong-viec-just-updated');
+  if(justUpdated===CURRENT_VERSION){
+    sessionStorage.removeItem('cong-viec-just-updated');
+    hideUpdateButtonForSession();
+    setTimeout(()=>showToast(`Cập nhật CÔNG VIỆC ${CURRENT_VERSION} hoàn tất.`),450);
+  }
+}
 function iconHTML(a,kind='card'){
   const cls=kind==='card'?'cardIcon':'navicon';
   if(a.iconType==='text') return `<div class="${cls}"><span class="iconText">${escapeHtml(a.icon||'APP')}</span></div>`;
@@ -123,21 +155,112 @@ document.getElementById('homeBtn').onclick=()=>goHome();
 document.getElementById('menuBtn').onclick=()=>sidebar.classList.toggle('open');
 window.addEventListener('popstate',()=>{const id=location.hash.slice(1);id?openApp(id,false):goHome(false)});
 
-window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstallPrompt=event;installBtn.hidden=false});
-window.addEventListener('appinstalled',()=>{deferredInstallPrompt=null;installBtn.innerHTML='✓ <span class="installText">Đã cài</span>';showToast('Đã cài CÔNG VIỆC thành công.')});
-installBtn.addEventListener('click',async()=>{
-  if(isStandalone()){showToast('CÔNG VIỆC đã được cài trên thiết bị này.');return}
-  if(deferredInstallPrompt){deferredInstallPrompt.prompt();const choice=await deferredInstallPrompt.userChoice;if(choice.outcome==='accepted')showToast('Đang hoàn tất cài đặt CÔNG VIỆC…');deferredInstallPrompt=null;return}
-  if(isIOS()){document.getElementById('iosModal').classList.remove('hidden');return}
-  showToast('Để cài ứng dụng, hãy mở trang bằng Chrome/Edge qua HTTPS rồi chọn Cài đặt ứng dụng.');
+window.addEventListener('beforeinstallprompt',event=>{
+  // Chrome/Edge/Cốc Cốc (khi hỗ trợ) sẽ đi qua luồng cài PWA chuẩn này.
+  event.preventDefault();
+  deferredInstallPrompt=event;
+  clearInstalledMark();
+  if(!isStandalone()) installBtn.hidden=false;
 });
+window.addEventListener('appinstalled',()=>{
+  deferredInstallPrompt=null;
+  markInstalled();
+  hideInstallButton();
+  showToast('Đã cài CÔNG VIỆC thành công. Nút Cài đặt đã được ẩn.');
+});
+
+async function waitForInstallPrompt(timeout=1200){
+  if(deferredInstallPrompt) return true;
+  try{
+    if('serviceWorker' in navigator && location.protocol.startsWith('http')) await navigator.serviceWorker.ready;
+  }catch(_){}
+  const started=Date.now();
+  while(!deferredInstallPrompt && Date.now()-started<timeout){
+    await new Promise(resolve=>setTimeout(resolve,120));
+  }
+  return !!deferredInstallPrompt;
+}
+
+function showBrowserInstallHelp(){
+  const title=document.getElementById('cocCocTitle');
+  const help=document.getElementById('cocCocHelp');
+  const name=browserLabel();
+  title.textContent=`Cài CÔNG VIỆC trên ${name}`;
+
+  if(isCocCoc()){
+    help.innerHTML=isAndroid()
+      ? 'Cốc Cốc chưa phát hộp cài tự động. Mở <strong>Menu Cốc Cốc</strong> và chọn mục <strong>Cài ứng dụng</strong> hoặc <strong>Thêm vào màn hình chính</strong> (tên mục có thể khác đôi chút tùy phiên bản). Sau khi cài xong, quay lại đây và bấm <strong>Tôi đã cài xong</strong>.'
+      : 'Cốc Cốc chưa phát hộp cài tự động. Mở <strong>Menu Cốc Cốc</strong> và tìm mục <strong>Cài ứng dụng</strong>. Nếu bản Cốc Cốc của bạn chỉ có tạo lối tắt, hãy dùng chức năng <strong>Tạo lối tắt</strong> để đưa CÔNG VIỆC ra Desktop. Sau khi hoàn tất, bấm <strong>Tôi đã cài xong</strong>.';
+  }else if(isEdge()){
+    help.innerHTML='Edge chưa phát hộp cài tự động. Mở <strong>Menu (…) → Ứng dụng (Apps)</strong> và chọn <strong>Cài đặt trang web này dưới dạng ứng dụng</strong>. Sau khi cài xong, quay lại đây và bấm <strong>Tôi đã cài xong</strong>.';
+  }else if(isChrome()){
+    help.innerHTML='Chrome chưa phát hộp cài tự động. Hãy dùng biểu tượng <strong>Cài đặt</strong> trên thanh địa chỉ nếu có, hoặc mở <strong>Menu (⋮)</strong> và chọn mục cài trang này thành ứng dụng. Sau khi cài xong, quay lại đây và bấm <strong>Tôi đã cài xong</strong>.';
+  }else{
+    help.innerHTML='Trình duyệt chưa phát hộp cài tự động. Hãy mở menu trình duyệt và tìm chức năng <strong>Cài ứng dụng</strong> hoặc <strong>Thêm vào màn hình chính</strong>.';
+  }
+  document.getElementById('cocCocModal').classList.remove('hidden');
+}
+
+installBtn.addEventListener('click',async()=>{
+  if(isStandalone()){
+    markInstalled();
+    hideInstallButton();
+    showToast('CÔNG VIỆC đã được cài trên thiết bị này.');
+    return;
+  }
+
+  // Chờ ngắn để Chromium có thời gian phát beforeinstallprompt sau khi SW/manifest sẵn sàng.
+  await waitForInstallPrompt();
+  if(deferredInstallPrompt){
+    const promptEvent=deferredInstallPrompt;
+    deferredInstallPrompt=null;
+    try{
+      await promptEvent.prompt();
+      const choice=await promptEvent.userChoice;
+      if(choice.outcome==='accepted'){
+        markInstalled();
+        hideInstallButton();
+        showToast('Đã cài CÔNG VIỆC. Nút Cài đặt đã được ẩn.');
+      }else{
+        // Người dùng hủy: vẫn giữ nút để cài lại khi muốn.
+        installBtn.hidden=false;
+      }
+    }catch(_){
+      installBtn.hidden=false;
+      showBrowserInstallHelp();
+    }
+    return;
+  }
+
+  if(isIOS()){
+    document.getElementById('iosModal').classList.remove('hidden');
+    return;
+  }
+
+  // Luồng dự phòng cho Chrome / Edge / Cốc Cốc khi browser không phát prompt.
+  showBrowserInstallHelp();
+});
+
 document.getElementById('closeIos').onclick=()=>document.getElementById('iosModal').classList.add('hidden');
 document.getElementById('iosModal').addEventListener('click',e=>{if(e.target.id==='iosModal')e.currentTarget.classList.add('hidden')});
+document.getElementById('closeCocCoc').onclick=()=>document.getElementById('cocCocModal').classList.add('hidden');
+document.getElementById('cocCocDone').onclick=()=>{
+  markInstalled();
+  hideInstallButton();
+  document.getElementById('cocCocModal').classList.add('hidden');
+  showToast('Đã ghi nhận cài đặt. Nút Cài đặt đã được ẩn.');
+};
+document.getElementById('cocCocModal').addEventListener('click',e=>{if(e.target.id==='cocCocModal')e.currentTarget.classList.add('hidden')});
+
+// Không phụ thuộc vào beforeinstallprompt để hiện nút: cả Chrome/Edge/Cốc Cốc đều thấy nút cài.
+setTimeout(()=>{
+  if(!isStandalone() && !wasMarkedInstalled()) installBtn.hidden=false;
+},500);
 
 async function registerSW(){
   if(!('serviceWorker' in navigator)||!location.protocol.startsWith('http')) return;
   try{
-    // v2.2: Service Worker chỉ phục vụ cache-first. Không chủ động gọi update khi mở ứng dụng.
+    // v2.3: Service Worker chỉ phục vụ cache-first. Không chủ động gọi update khi mở ứng dụng.
     swRegistration=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'all'});
   }catch(err){console.warn('Service Worker:',err)}
 }
@@ -169,21 +292,24 @@ updateBtn.addEventListener('click',async()=>{
     const info=await response.json();
     const remote=String(info.version||'').trim();
     if(!remote || remote===CURRENT_VERSION){
-      showToast('Bạn đang dùng phiên bản mới nhất.');
-      updateBtn.innerHTML='↻ <span class="updateText">Cập nhật</span>';updateBtn.disabled=false;return;
+      showToast('Bạn đang dùng phiên bản mới nhất. Nút Cập nhật sẽ tự ẩn.');
+      hideUpdateButtonForSession();
+      return;
     }
     showToast(`Có phiên bản ${remote}. Đang cập nhật…`,3200);
+    try{sessionStorage.setItem('cong-viec-just-updated',remote)}catch(_){}
+    updateBtn.hidden=true;
     await clearCongViecCaches();
     await refreshKnownServiceWorkers();
     // Ép lần tải kế tiếp lấy file mới từ máy chủ; sau đó lại chạy cache-first.
     location.replace(`${location.pathname}?v=${encodeURIComponent(remote)}${location.hash}`);
   }catch(_){
     showToast('Chưa thể kiểm tra cập nhật. Hãy kiểm tra kết nối mạng.');
-    updateBtn.innerHTML='↻ <span class="updateText">Cập nhật</span>';updateBtn.disabled=false;
+    restoreUpdateButton();
   }
 });
 
-if(isStandalone()) installBtn.innerHTML='✓ <span class="installText">Đã cài</span>';
+syncActionButtons();
 loadApps();registerSW();
 </script>
 </body>
