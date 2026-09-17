@@ -1,6 +1,6 @@
-// CÔNG VIỆC v2.4 - cache-first, cập nhật thủ công.
+// CÔNG VIỆC v2.4.1 - cache-first, cập nhật thủ công.
 // Giữ CACHE_NAME ổn định qua các bản phát hành thông thường để tránh tải lại toàn bộ file.
-const CACHE_NAME = 'cong-viec-runtime-v1';
+const CACHE_NAME = 'cong-viec-runtime-v2';
 const PRECACHE = [
   './',
   './index.html',

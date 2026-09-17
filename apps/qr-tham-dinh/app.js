@@ -152,6 +152,23 @@
     }
   }
 
+  let titleBeforePrint = '';
+  function prepareCleanPrint(){
+    applyPrintPageStyle();
+    document.documentElement.classList.add('printing-clean');
+    if(!titleBeforePrint) titleBeforePrint = document.title;
+    // Không để trình duyệt lấy tiêu đề ứng dụng làm đầu trang khi in.
+    document.title = '\u200B';
+  }
+
+  function restoreAfterPrint(){
+    document.documentElement.classList.remove('printing-clean');
+    if(titleBeforePrint){
+      document.title = titleBeforePrint;
+      titleBeforePrint = '';
+    }
+  }
+
   function safeBaseName(){
     return (els.placeName.value.trim() || 'so-do-dia-diem-tham-dinh')
       .replace(/[^a-zA-Z0-9\u00C0-\u024F_-]+/g,'-')
@@ -1138,7 +1155,7 @@
     const doPrint = () => {
       if(!destinationText()) { toast('Hãy nhập tọa độ, link Google Maps hoặc địa chỉ trước khi in.'); return; }
       updatePaperUi();
-      applyPrintPageStyle();
+      prepareCleanPrint();
       updateMap();
       requestAnimationFrame(() => requestAnimationFrame(() => window.print()));
     };
@@ -1237,7 +1254,11 @@
     const previewObserver = new ResizeObserver(() => requestAnimationFrame(fitPreviewSheet));
     previewObserver.observe(els.previewArea);
   }
-  window.addEventListener('afterprint', () => requestAnimationFrame(fitPreviewSheet));
+  window.addEventListener('beforeprint', prepareCleanPrint);
+  window.addEventListener('afterprint', () => {
+    restoreAfterPrint();
+    requestAnimationFrame(fitPreviewSheet);
+  });
 
   bind();
   initMarkerDrag();

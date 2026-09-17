@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gpp-so-do-runtime-v1';
+const CACHE_NAME = 'gpp-so-do-runtime-v2';
 const APP_SHELL = [
   './','./index.html','./manifest.webmanifest','./icons/gpp-icon.svg','./icons/favicon-32.png',
   './icons/apple-touch-icon.png','./icons/icon-192.png','./icons/icon-512.png',

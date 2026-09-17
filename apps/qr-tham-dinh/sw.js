@@ -1,6 +1,6 @@
-const CACHE_VERSION = 'qr-tham-dinh-runtime-v1';
+const CACHE_VERSION = 'qr-tham-dinh-runtime-v2';
 const APP_SHELL = [
-  './', './index.html', './styles.css?v=26', './app.js?v=26', './v26.js?v=26', './manifest.json',
+  './', './index.html', './styles.css?v=27', './app.js?v=27', './v26.js?v=27', './manifest.json',
   './assets/brand-truong-gpp.png', './assets/favicon-y-te-32.png',
   './assets/apple-touch-icon.png', './assets/app-icon-192.png', './assets/app-icon-512.png',
   './assets/app-icon-maskable-512.png', './assets/so-do-dia-diem-template.png',

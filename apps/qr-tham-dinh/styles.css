@@ -647,3 +647,13 @@ body:not(.pdf-exporting):not(.capture-mode) #exportMapSurface{display:none!impor
 body:not(.pdf-exporting):not(.capture-mode) #staticMapImage.hidden{display:none!important}
 .map-frame iframe{background:#f6f7f8}
 .preview-sync-status.v26-ready{background:#eef9f3!important;border-color:#bfe2d0!important;color:#14724a!important}
+
+/* v27: bảo vệ bản in sạch; thông tin điều khiển chỉ hiển thị trên màn hình. */
+@media print{
+  html.printing-clean,html.printing-clean body{margin:0!important;padding:0!important}
+  html.printing-clean .topbar,
+  html.printing-clean .author-strip,
+  html.printing-clean .panel,
+  html.printing-clean .preview-toolbar,
+  html.printing-clean .toast{display:none!important}
+}

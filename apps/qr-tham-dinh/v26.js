@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const VERSION='26.0';
+  const VERSION='27.0';
   window.__QR_EXPORT_PATCH_VERSION__=VERSION;
   const $=id=>document.getElementById(id);
   const address=$('address'), addressOutput=$('addressOutput');
