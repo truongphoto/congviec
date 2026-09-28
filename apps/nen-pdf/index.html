@@ -728,6 +728,22 @@
   max-width: 100%; max-height: 66vh; display: block; border-radius: 10px; background: #fff;
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
 }
+.imgpdf-preview-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px;
+}
+.imgpdf-preview-head .imgpdf-shell-title { margin: 0; }
+.imgpdf-auto-btn {
+  min-width: 92px; min-height: 40px; padding: 0 16px; border: 1px solid #0f5ccd; border-radius: 11px;
+  background: linear-gradient(180deg, #1877f2 0%, #0f5ccd 100%); color: #fff; font-weight: 850; cursor: pointer;
+  box-shadow: 0 8px 18px rgba(24,119,242,.18);
+}
+.imgpdf-auto-btn:hover { filter: brightness(.97); }
+.imgpdf-save-btn {
+  width: 100%; min-height: 48px; margin-top: 12px; border: 0; border-radius: 13px;
+  background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-weight: 900; font-size: 1rem;
+  cursor: pointer; box-shadow: 0 10px 22px rgba(21,128,61,.18);
+}
+.imgpdf-save-btn:hover { filter: brightness(.97); transform: translateY(-1px); }
 .imgpdf-preview-wrap {
   display: grid; place-items: center; min-height: 240px; border-radius: 14px; border: 1px dashed #cfd9e8; background: #fff;
   overflow: auto; padding: 8px;
@@ -939,44 +955,27 @@
   <div class="imgpdf-dialog" role="dialog" aria-modal="true" aria-labelledby="imgPdfCornerTitle">
     <div class="imgpdf-dialog-head">
       <div>
-        <h3 id="imgPdfCornerTitle" class="imgpdf-dialog-title">Cân giấy 4 góc</h3>
-        <p class="imgpdf-dialog-subtitle">Bạn có thể để phần mềm <strong>Tự nhận 4 góc</strong> hoặc <strong>chấm tay 4 góc</strong> theo thứ tự: trên trái → trên phải → dưới phải → dưới trái. Ảnh gốc vẫn được giữ nguyên; chỉ bản xuất PDF dùng ảnh đã cân.</p>
+        <h3 id="imgPdfCornerTitle" class="imgpdf-dialog-title">Cân chỉnh ảnh</h3>
+        <p class="imgpdf-dialog-subtitle">Kéo 4 góc vào đúng mép giấy. Lăn chuột để phóng to/thu nhỏ và kéo nền ảnh để di chuyển. Ảnh gốc vẫn được giữ nguyên.</p>
       </div>
       <button id="imgPdfCornerCloseTop" class="imgpdf-dialog-close" type="button" aria-label="Đóng">✕</button>
     </div>
     <div class="imgpdf-corner-layout">
       <div class="imgpdf-editor-shell">
-        <h4 class="imgpdf-shell-title">Ảnh gốc để chấm / chỉnh 4 góc</h4>
+        <h4 class="imgpdf-shell-title">Ảnh gốc · kéo 4 góc để cân</h4>
         <div class="imgpdf-editor-wrap"><canvas id="imgPdfEditorCanvas" class="imgpdf-editor-canvas"></canvas></div>
-        <div class="imgpdf-editor-toolbar">
-          <button id="imgPdfEditorAutoBtn" class="primary" type="button">Tự cân</button>
-          <button id="imgPdfEditorResetBtn" type="button">Làm lại 4 góc</button>
-          <button id="imgPdfEditorUndoBtn" type="button">Xóa điểm cuối</button>
-          <button id="imgPdfEditorClearBtn" class="warn" type="button">Bỏ cân ảnh này</button>
-        </div>
-        <div class="imgpdf-editor-toolbar imgpdf-view-tools">
-          <button id="imgPdfZoomOutBtn" type="button">− Thu nhỏ</button>
-          <button id="imgPdfZoomInBtn" type="button">＋ Phóng to</button>
-          <button id="imgPdfFitBtn" type="button">Vừa khung</button>
-          <button id="imgPdfResetViewBtn" type="button">Đặt lại khung nhìn</button>
-        </div>
-        <div id="imgPdfViewState" class="imgpdf-view-state">Chuột lăn để <strong>phóng to/thu nhỏ</strong> · kéo nền ảnh để <strong>di chuyển</strong> · kéo các điểm để chỉnh 4 góc.</div>
-        <ol class="imgpdf-corner-steps">
-          <li>Nếu tự nhận đúng, chỉ cần bấm <strong>Áp dụng</strong>.</li>
-          <li>Nếu muốn chấm tay, hãy bấm lần lượt 4 góc: <strong>trên trái → trên phải → dưới phải → dưới trái</strong>.</li>
-          <li>Sau khi đủ 4 điểm, khung xem trước bên phải sẽ tự cập nhật.</li>
-        </ol>
+        <div id="imgPdfViewState" class="imgpdf-view-state">Chuột lăn để <strong>phóng to/thu nhỏ</strong> · kéo nền ảnh để <strong>di chuyển</strong> · kéo 4 điểm để chỉnh chính xác.</div>
         <div id="imgPdfCornerState" class="imgpdf-corner-state" aria-live="polite"></div>
       </div>
       <div class="imgpdf-preview-shell">
-        <h4 class="imgpdf-shell-title">Xem trước sau khi cân</h4>
+        <div class="imgpdf-preview-head">
+          <h4 class="imgpdf-shell-title">Sau cân</h4>
+          <button id="imgPdfEditorAutoBtn" class="imgpdf-auto-btn" type="button">Auto</button>
+        </div>
         <div class="imgpdf-preview-wrap"><canvas id="imgPdfPreviewCanvas" class="imgpdf-preview-canvas"></canvas></div>
-        <div class="imgpdf-small-note">Mẹo: nếu tự nhận không chính xác, chỉ cần chấm lại 4 góc. Khi bấm <strong>Bỏ cân ảnh này</strong>, ảnh sẽ trở về xuất PDF theo cách cũ.</div>
+        <button id="imgPdfCornerApplyBtn" class="imgpdf-save-btn" type="button">Lưu</button>
+        <div class="imgpdf-small-note">Bấm <strong>Lưu</strong> để hoàn tất ảnh này. Kết quả sẽ được ghi nhớ và cửa sổ tự đóng để bạn tiếp tục ảnh khác.</div>
       </div>
-    </div>
-    <div class="imgpdf-dialog-actions">
-      <button id="imgPdfCornerCancelBtn" type="button">Hủy</button>
-      <button id="imgPdfCornerApplyBtn" class="primary" type="button">Áp dụng</button>
     </div>
   </div>
 </div>
@@ -1635,20 +1634,12 @@
 
   const cornerModal = document.getElementById('imgPdfCornerModal');
   const cornerCloseTop = document.getElementById('imgPdfCornerCloseTop');
-  const cornerCancelBtn = document.getElementById('imgPdfCornerCancelBtn');
   const cornerApplyBtn = document.getElementById('imgPdfCornerApplyBtn');
   const cornerAutoBtn = document.getElementById('imgPdfEditorAutoBtn');
-  const cornerResetBtn = document.getElementById('imgPdfEditorResetBtn');
-  const cornerUndoBtn = document.getElementById('imgPdfEditorUndoBtn');
-  const cornerClearBtn = document.getElementById('imgPdfEditorClearBtn');
   const cornerState = document.getElementById('imgPdfCornerState');
   const editorCanvas = document.getElementById('imgPdfEditorCanvas');
   const editorWrap = editorCanvas.parentElement;
   const previewCanvas = document.getElementById('imgPdfPreviewCanvas');
-  const zoomOutBtn = document.getElementById('imgPdfZoomOutBtn');
-  const zoomInBtn = document.getElementById('imgPdfZoomInBtn');
-  const fitBtn = document.getElementById('imgPdfFitBtn');
-  const resetViewBtn = document.getElementById('imgPdfResetViewBtn');
   const viewState = document.getElementById('imgPdfViewState');
   const editorCtx = editorCanvas.getContext('2d', { alpha: false });
   const previewCtx = previewCanvas.getContext('2d', { alpha: false });
@@ -2176,7 +2167,7 @@
           ];
           editor.lastDetectionMode = 'manual';
         }
-        setCornerState('Kéo 4 góc vào đúng mép giấy, hoặc bấm Tự cân. Có thể lăn chuột để zoom và kéo ảnh để di chuyển.');
+        setCornerState('Kéo 4 góc vào đúng mép giấy. Nếu muốn làm nhanh, bấm Auto ở khung bên phải. Sau khi kiểm tra kết quả, bấm Lưu.');
       }
       renderEditor();
       queuePreview();
@@ -2281,7 +2272,7 @@
       editor.lastDetectionMode = 'manual';
       editor.points.push(canvasToSourcePoint(editor.pointerCurrent));
       renderEditor(); queuePreview();
-      setCornerState(editor.points.length < 4 ? `Đã chấm ${editor.points.length}/4 góc. Tiếp tục chấm theo thứ tự: trên trái → trên phải → dưới phải → dưới trái.` : 'Đã đủ 4 góc. Hãy xem trước bên phải rồi bấm Áp dụng.');
+      setCornerState(editor.points.length < 4 ? `Đã chấm ${editor.points.length}/4 góc. Tiếp tục chấm theo thứ tự: trên trái → trên phải → dưới phải → dưới trái.` : 'Đã đủ 4 góc. Kiểm tra khung Sau cân rồi bấm Lưu.');
     }
     editor.dragging = -1;
     editor.panning = false;
@@ -2532,32 +2523,13 @@
   window.addEventListener('pointerup', endDrag);
   window.addEventListener('resize', () => { if (editor.open && editor.sourceCanvas) { resetViewport(true); renderEditor(); queuePreview(); } });
   cornerCloseTop.addEventListener('click', closeCornerEditor);
-  cornerCancelBtn.addEventListener('click', closeCornerEditor);
   cornerApplyBtn.addEventListener('click', applyCurrentCorners);
-  cornerResetBtn.addEventListener('click', () => {
-    editor.lastDetectionMode = 'manual';
-    editor.points = [];
-    renderEditor(); queuePreview();
-    setCornerState('Đã xóa các điểm cũ. Hãy chấm lại 4 góc theo thứ tự.');
-  });
-  cornerUndoBtn.addEventListener('click', () => {
-    if (!editor.points.length) return;
-    editor.lastDetectionMode = 'manual';
-    editor.points.pop();
-    renderEditor(); queuePreview();
-    setCornerState(editor.points.length ? `Đã xóa điểm cuối. Còn ${editor.points.length}/4 góc.` : 'Đã xóa hết điểm. Hãy chấm lại 4 góc.');
-  });
-  cornerClearBtn.addEventListener('click', clearCurrentCorrection);
-  zoomInBtn.addEventListener('click', () => { if (editor.open) setZoom(editor.zoom * 1.2); });
-  zoomOutBtn.addEventListener('click', () => { if (editor.open) setZoom(editor.zoom / 1.2); });
-  fitBtn.addEventListener('click', () => { if (editor.open && editor.sourceCanvas) { editor.zoom = 1; resetViewport(false); renderEditor(); } });
-  resetViewBtn.addEventListener('click', () => { if (editor.open && editor.sourceCanvas) { editor.zoom = 1; resetViewport(false); renderEditor(); } });
   cornerAutoBtn.addEventListener('click', () => {
     if (!editor.sourceCanvas) return;
     try {
       editor.points = autoDetectCornersFromCanvas(editor.sourceCanvas);
       editor.lastDetectionMode = 'auto';
-      setCornerState('Đã tự cân 4 góc. Hãy xem trước rồi bấm Áp dụng.');
+      setCornerState('Đã tự cân 4 góc. Kiểm tra kết quả rồi bấm Lưu.');
       renderEditor(); queuePreview();
     } catch (err) {
       setCornerState(err?.message || 'Tự nhận 4 góc chưa thành công. Bạn có thể chấm tay 4 góc.', true);
