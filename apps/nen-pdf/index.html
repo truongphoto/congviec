@@ -692,12 +692,17 @@
   background: rgba(13, 18, 31, 0.55); padding: 14px;
 }
 .imgpdf-dialog {
-  width: min(1080px, calc(100vw - 28px)); max-height: calc(100vh - 28px); overflow: auto;
+  width: min(1080px, calc(100vw - 28px));
+  height: min(690px, calc(100vh - 20px));
+  max-height: calc(100vh - 20px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   border-radius: 22px; background: #fff; border: 1px solid rgba(15, 23, 42, 0.10);
-  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.30); padding: 16px;
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.30); padding: 14px;
 }
 .imgpdf-dialog-head {
-  display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 12px;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 8px;
 }
 .imgpdf-dialog-title { margin: 0; font-size: 1.15rem; font-weight: 850; }
 .imgpdf-dialog-subtitle { margin: 4px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.5; }
@@ -706,15 +711,26 @@
   font-size: 1rem; font-weight: 800; color: var(--text); cursor: pointer;
 }
 .imgpdf-corner-layout {
-  display: grid; grid-template-columns: minmax(320px, 1.1fr) minmax(260px, .9fr); gap: 14px; align-items: start;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(320px, 1.1fr) minmax(260px, .9fr);
+  gap: 12px;
+  align-items: stretch;
 }
 .imgpdf-editor-shell, .imgpdf-preview-shell {
-  border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 18px; padding: 12px; background: #fbfdff;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 18px; padding: 10px; background: #fbfdff;
 }
+.imgpdf-editor-shell { display: flex; flex-direction: column; }
+.imgpdf-preview-shell { display: flex; flex-direction: column; }
 .imgpdf-shell-title { margin: 0 0 10px; font-size: .93rem; font-weight: 800; color: var(--text); }
 .imgpdf-editor-wrap {
   position: relative;
-  display: grid; place-items: center; min-height: 320px; border-radius: 14px; border: 1px dashed #cfd9e8;
+  flex: 1;
+  min-height: 0;
+  display: grid; place-items: center; border-radius: 14px; border: 1px dashed #cfd9e8;
   background: repeating-conic-gradient(from 45deg, #f7f9fc 0% 25%, #eef3f9 0% 50%) 50% / 20px 20px;
   overflow: hidden;
   touch-action: none;
@@ -725,7 +741,7 @@
 .imgpdf-editor-wrap.is-panning { cursor: grabbing; }
 .imgpdf-editor-wrap.is-dragging-point { cursor: move; }
 .imgpdf-editor-canvas, .imgpdf-preview-canvas {
-  max-width: 100%; max-height: 66vh; display: block; border-radius: 10px; background: #fff;
+  max-width: 100%; max-height: 100%; display: block; border-radius: 10px; background: #fff;
   box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
 }
 .imgpdf-preview-head {
@@ -739,21 +755,23 @@
 }
 .imgpdf-auto-btn:hover { filter: brightness(.97); }
 .imgpdf-save-btn {
-  width: 100%; min-height: 48px; margin-top: 12px; border: 0; border-radius: 13px;
+  width: 100%; min-height: 44px; margin-top: 8px; border: 0; border-radius: 13px;
   background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-weight: 900; font-size: 1rem;
   cursor: pointer; box-shadow: 0 10px 22px rgba(21,128,61,.18);
 }
 .imgpdf-save-btn:hover { filter: brightness(.97); transform: translateY(-1px); }
 .imgpdf-preview-wrap {
-  display: grid; place-items: center; min-height: 240px; border-radius: 14px; border: 1px dashed #cfd9e8; background: #fff;
-  overflow: auto; padding: 8px;
+  flex: 1;
+  min-height: 0;
+  display: grid; place-items: center; border-radius: 14px; border: 1px dashed #cfd9e8; background: #fff;
+  overflow: hidden; padding: 6px;
 }
 .imgpdf-editor-toolbar {
   margin-top: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
 }
 .imgpdf-view-tools { margin-top: 8px; }
 .imgpdf-view-state {
-  margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: #eff6ff; color: #1d4ed8;
+  margin-top: 6px; padding: 7px 10px; border-radius: 10px; background: #eff6ff; color: #1d4ed8;
   font-size: .82rem; line-height: 1.55; border: 1px solid #c7ddff;
 }
 .imgpdf-view-state strong { color: #0f172a; }
@@ -774,17 +792,18 @@
   margin: 12px 0 0; padding-left: 18px; color: var(--muted); font-size: .84rem; line-height: 1.65;
 }
 .imgpdf-corner-state {
-  margin-top: 10px; min-height: 22px; font-size: .86rem; color: var(--muted); line-height: 1.45;
+  margin-top: 5px; min-height: 18px; font-size: .80rem; color: var(--muted); line-height: 1.45;
 }
 .imgpdf-corner-state.error { color: #b42318; }
 .imgpdf-small-note {
-  margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: #f8fafc; color: var(--muted); font-size: .82rem; line-height: 1.55;
+  margin-top: 6px; padding: 7px 9px; border-radius: 10px; background: #f8fafc; color: var(--muted); font-size: .82rem; line-height: 1.55;
   border: 1px solid #e6edf7;
 }
-@media (max-width: 900px) {
-  .imgpdf-corner-layout { grid-template-columns: 1fr; }
-  .imgpdf-editor-toolbar { grid-template-columns: 1fr 1fr; }
-  .imgpdf-dialog { padding: 14px; }
+@media (max-width: 760px) {
+  .imgpdf-dialog { width: calc(100vw - 12px); height: calc(100vh - 12px); padding: 10px; }
+  .imgpdf-corner-layout { grid-template-columns: 1fr 0.82fr; gap: 8px; }
+  .imgpdf-editor-shell, .imgpdf-preview-shell { padding: 7px; border-radius: 14px; }
+  .imgpdf-dialog-subtitle, .imgpdf-small-note, .imgpdf-view-state { font-size: .74rem; }
 }
 @media (max-width: 620px) {
   .imgpdf-dialog-head { align-items: stretch; flex-direction: column; }
@@ -1991,21 +2010,23 @@
   function resetViewport(keepZoom = false) {
     if (!editor.sourceCanvas) return;
     const wrapRect = editorWrap.getBoundingClientRect();
-    const maxW = Math.max(320, Math.min(window.innerWidth * 0.58, 760, wrapRect.width || 760));
-    const maxH = Math.max(320, Math.min(window.innerHeight * 0.62, 680, window.innerHeight - 260));
-    editorCanvas.width = Math.max(320, Math.round(maxW));
-    editorCanvas.height = Math.max(260, Math.round(maxH));
-    const newFit = Math.min(editorCanvas.width / editor.sourceCanvas.width, editorCanvas.height / editor.sourceCanvas.height);
-    const focusSource = keepZoom ? { x: (editorCanvas.width / 2 - editor.panX) / Math.max(0.0001, getActualScale()), y: (editorCanvas.height / 2 - editor.panY) / Math.max(0.0001, getActualScale()) } : null;
-    editor.fitScale = newFit;
+    const canvasW = Math.max(220, Math.floor(wrapRect.width || 620));
+    const canvasH = Math.max(180, Math.floor(wrapRect.height || Math.min(430, window.innerHeight - 250)));
+    const oldScale = Math.max(0.0001, getActualScale());
+    const oldCenter = keepZoom ? {
+      x: (editorCanvas.width / 2 - editor.panX) / oldScale,
+      y: (editorCanvas.height / 2 - editor.panY) / oldScale
+    } : null;
+    editorCanvas.width = canvasW;
+    editorCanvas.height = canvasH;
+    editor.fitScale = Math.min(editorCanvas.width / editor.sourceCanvas.width, editorCanvas.height / editor.sourceCanvas.height);
     editor.minZoom = 1;
     if (!keepZoom || !Number.isFinite(editor.zoom)) editor.zoom = 1;
-    if (focusSource) {
-      const actualScale = getActualScale();
-      editor.panX = editorCanvas.width / 2 - focusSource.x * actualScale;
-      editor.panY = editorCanvas.height / 2 - focusSource.y * actualScale;
+    const actualScale = getActualScale();
+    if (oldCenter) {
+      editor.panX = editorCanvas.width / 2 - oldCenter.x * actualScale;
+      editor.panY = editorCanvas.height / 2 - oldCenter.y * actualScale;
     } else {
-      const actualScale = getActualScale();
       editor.panX = (editorCanvas.width - editor.sourceCanvas.width * actualScale) / 2;
       editor.panY = (editorCanvas.height - editor.sourceCanvas.height * actualScale) / 2;
     }
