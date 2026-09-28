@@ -2406,6 +2406,18 @@
       const converted = await imageToJpegBytes(sourceItems[i]);
       const embedded = await pdf.embedJpg(converted.bytes);
       let pw, ph;
+      const isCorrected = !!sourceItems[i].correction?.corners?.length;
+
+      // Ảnh đã cân/crop: lấy chính vùng crop làm toàn bộ trang PDF.
+      // Không thêm lề, không đặt lại vào A4, không kéo méo và không cắt mất mép đã chọn.
+      if (isCorrected) {
+        pw = Math.max(72, Math.min(14400, converted.width * 0.75));
+        ph = Math.max(72, Math.min(14400, converted.height * 0.75));
+        const page = pdf.addPage([pw, ph]);
+        page.drawImage(embedded, { x: 0, y: 0, width: pw, height: ph });
+        continue;
+      }
+
       if (pageSize.value === 'image') {
         pw = Math.max(72, Math.min(14400, converted.width * 0.75));
         ph = Math.max(72, Math.min(14400, converted.height * 0.75));
