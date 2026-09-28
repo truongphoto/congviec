@@ -1717,8 +1717,13 @@
     pts.sort((a, b) => Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx));
     const startIdx = pts.reduce((best, p, i, arr) => (p.x + p.y < arr[best].x + arr[best].y ? i : best), 0);
     const ordered = pts.slice(startIdx).concat(pts.slice(0, startIdx));
-    if (polygonSignedArea(ordered) < 0) ordered.reverse();
-    return [ordered[0], ordered[3], ordered[2], ordered[1]];
+    // Tọa độ Canvas có trục Y hướng xuống. Sau khi sắp theo góc và đưa điểm
+    // trên-trái lên đầu, thứ tự đúng để nắn phối cảnh là TL → TR → BR → BL.
+    // Chỉ đảo chiều khi đa giác đang chạy ngược chiều đó, nhưng vẫn giữ TL ở đầu.
+    if (polygonSignedArea(ordered) < 0) {
+      return [ordered[0], ordered[3], ordered[2], ordered[1]];
+    }
+    return ordered;
   }
 
   function normalizeCorners(points, width, height) {
