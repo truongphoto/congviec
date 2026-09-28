@@ -29,7 +29,7 @@
 
     * { box-sizing: border-box; }
 
-    html, body { min-height: 100%; }
+    html, body { height: 100%; overflow: hidden; }
 
     body {
       margin: 0;
@@ -38,15 +38,18 @@
         radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 28rem),
         var(--bg);
       color: var(--text);
+      overflow: hidden;
     }
 
     button, input { font: inherit; }
 
     .page {
+      height: 100vh;
       min-height: 100vh;
       display: grid;
-      place-items: center;
-      padding: 28px 16px;
+      place-items: stretch;
+      padding: 14px 12px;
+      overflow: hidden;
     }
 
     .app {
@@ -839,6 +842,69 @@
   .imgpdf-dialog-actions button { width: 100%; }
 }
 
+
+    /* ẢNH → PDF: chỉ mở rộng không gian khi tab này hoạt động; không tác động Nén PDF cũ */
+    .app.image-mode {
+      width: 100%;
+      max-width: none;
+      height: 100%;
+      padding: 8px 12px 8px;
+      display: grid;
+      grid-template-rows: auto auto minmax(0, 1fr);
+      gap: 6px;
+      overflow: hidden;
+    }
+    .app.image-mode .brand {
+      margin: 0;
+      gap: 8px;
+      min-height: 30px;
+    }
+    .app.image-mode .brand-icon {
+      width: 30px;
+      height: 30px;
+      flex-basis: 30px;
+      border-radius: 9px;
+      box-shadow: 0 5px 12px rgba(37,99,235,.16);
+    }
+    .app.image-mode .brand-icon svg { width: 18px; height: 18px; }
+    .app.image-mode h1 {
+      font-size: 1.02rem;
+      line-height: 1.05;
+      letter-spacing: -.015em;
+      white-space: nowrap;
+    }
+    .app.image-mode .tool-tabs {
+      margin-top: 0;
+      gap: 6px;
+    }
+    .app.image-mode .tool-tab {
+      min-height: 32px;
+      padding: 4px 10px;
+      border-radius: 9px;
+      font-size: .88rem;
+      box-shadow: none;
+    }
+    .app.image-mode .tool-panel { min-height: 0; }
+
+    /* GHÉP NỐI ẢNH → PDF HOÀN CHỈNH: core độc lập, cô lập khỏi Nén PDF cũ */
+    #imagePdfPanel.active {
+      display: block;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+    }
+    .integrated-imgpdf-frame {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      border: 0;
+      border-radius: 0;
+      display: block;
+      background: transparent;
+    }
+    #imagePdfPanel > .imgpdf-addon { display: none !important; }
+    #imgPdfCornerModal { display: none !important; }
+
   </style>
 </head>
 <body>
@@ -854,7 +920,6 @@
         </div>
         <div>
           <h1 id="appTitle">Nén PDF trực tiếp trên trình duyệt</h1>
-          <div class="privacy">🔒 File không được tải lên máy chủ</div>
         </div>
       </div>
 
@@ -950,6 +1015,7 @@
 
       <!-- BỔ SUNG ĐỘC LẬP: ẢNH → PDF. Chỉ hiển thị khi chọn tab Ảnh → PDF. -->
       <div id="imagePdfPanel" class="tool-panel" role="tabpanel" aria-labelledby="imagePdfTab">
+      <iframe id="integratedImgPdfFrame" class="integrated-imgpdf-frame" src="./anh-pdf.html?cv=2.4.24" title="Ảnh sang PDF" loading="eager"></iframe>
       <div class="imgpdf-addon" id="imgPdfAddon">
         <div id="imgPdfPanel" class="imgpdf-panel">
           <div id="imgPdfDropzone" class="imgpdf-dropzone" tabindex="0" role="button" aria-label="Chọn hoặc kéo thả nhiều ảnh">
@@ -1000,7 +1066,7 @@
   <div class="imgpdf-dialog" role="dialog" aria-modal="true" aria-labelledby="imgPdfCornerTitle">
     <div class="imgpdf-dialog-head">
       <div>
-        <h3 id="imgPdfCornerTitle" class="imgpdf-dialog-title">Cân chỉnh ảnh</h3>
+        <h3 id="imgPdfCornerTitle" class="imgpdf-dialog-title"></h3>
         <p class="imgpdf-dialog-subtitle">Kéo 4 góc vào đúng mép giấy. Lăn chuột để phóng to/thu nhỏ và kéo nền ảnh để di chuyển. Ảnh gốc vẫn được giữ nguyên.</p>
       </div>
       <button id="imgPdfCornerCloseTop" class="imgpdf-dialog-close" type="button" aria-label="Đóng">✕</button>
@@ -2652,8 +2718,10 @@
       const imagePdfTab = document.getElementById('imagePdfTab');
       const compressPanel = document.getElementById('compressPanel');
       const imagePdfPanel = document.getElementById('imagePdfPanel');
+      const appRoot = document.querySelector('.app');
       function show(mode) {
         const imageMode = mode === 'image';
+        appRoot?.classList.toggle('image-mode', imageMode);
         compressTab.classList.toggle('active', !imageMode);
         imagePdfTab.classList.toggle('active', imageMode);
         compressPanel.classList.toggle('active', !imageMode);
