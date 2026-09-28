@@ -2443,9 +2443,26 @@
     return { bytes: new Uint8Array(await blob.arrayBuffer()), width: outW, height: outH };
   }
 
-  function safePdfName(name) {
-    const base = (name || 'anh').replace(/\.[^.]+$/, '').trim() || 'anh';
-    return base.replace(/[\/:*?"<>|]+/g, '_') + '.pdf';
+  const COUNTER_KEYS = {
+    P: 'gpp_pdf_counter_p',
+    G: 'gpp_pdf_counter_g'
+  };
+
+  function nextPdfCounter(type) {
+    const key = COUNTER_KEYS[type];
+    if (!key) throw new Error('Loại bộ đếm tên file không hợp lệ.');
+    let current = 0n;
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved && /^\d+$/.test(saved)) current = BigInt(saved);
+    } catch (_) {}
+    const next = current + 1n;
+    try { localStorage.setItem(key, next.toString()); } catch (_) {}
+    return next.toString();
+  }
+
+  function nextPdfName(type) {
+    return `GPP-${type}${nextPdfCounter(type)}.pdf`;
   }
 
   async function buildPdfFromItems(sourceItems) {
@@ -2506,7 +2523,7 @@
       for (let i = 0; i < items.length; i++) {
         setStatus(`Đang xuất file ${i + 1}/${items.length}: ${items[i].file.name}`);
         const bytes = await buildPdfFromItems([items[i]]);
-        downloadPdfBytes(bytes, safePdfName(items[i].file.name));
+        downloadPdfBytes(bytes, nextPdfName('P'));
       }
       setStatus(`Hoàn tất: đã xuất ${items.length} file PDF riêng. Nếu trình duyệt hỏi, hãy cho phép tải nhiều file.`);
     } catch (err) {
@@ -2527,7 +2544,7 @@
     try {
       for (let i = 0; i < items.length; i++) setStatus(`Đang xử lý ảnh ${i + 1}/${items.length}: ${items[i].file.name}`);
       const bytes = await buildPdfFromItems(items);
-      downloadPdfBytes(bytes, `anh-sang-pdf-${new Date().toISOString().slice(0,10)}.pdf`);
+      downloadPdfBytes(bytes, nextPdfName('G'));
       setStatus(`Hoàn tất: ${items.length} ảnh → 1 PDF (${fmt(bytes.byteLength)}).`);
     } catch (err) {
       console.error(err);
