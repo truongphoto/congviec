@@ -1,6 +1,6 @@
-// CÔNG VIỆC v2.4.2 - cache-first, cập nhật thủ công.
+// CÔNG VIỆC v2.4.3 - cache-first, cập nhật thủ công; cache thế hệ mới chống kẹt bản cũ.
 // Giữ CACHE_NAME ổn định qua các bản phát hành thông thường để tránh tải lại toàn bộ file.
-const CACHE_NAME = 'cong-viec-runtime-v2';
+const CACHE_NAME = 'cong-viec-runtime-v3';
 const PRECACHE = [
   './',
   './index.html',
@@ -13,7 +13,11 @@ const PRECACHE = [
 ];
 
 self.addEventListener('install', event => {
-  event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE)));
+  event.waitUntil((async()=>{
+    const cache=await caches.open(CACHE_NAME);
+    await cache.addAll(PRECACHE);
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', event => {
@@ -36,8 +40,8 @@ self.addEventListener('fetch', event => {
   const url = new URL(req.url);
   if (url.origin !== self.location.origin) return;
 
-  // version.json chỉ được gọi khi người dùng bấm Cập nhật và phải luôn hỏi máy chủ.
-  if (url.pathname.endsWith('/version.json')) {
+  // version.json và URL có tham số cv/refresh luôn hỏi máy chủ để thoát cache cũ.
+  if (url.pathname.endsWith('/version.json') || url.searchParams.has('cv') || url.searchParams.has('refresh')) {
     event.respondWith(fetch(req, { cache: 'no-store' }));
     return;
   }
