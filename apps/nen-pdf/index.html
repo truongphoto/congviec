@@ -540,29 +540,52 @@
     .imgpdf-list {
       margin-top: 12px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
-      gap: 8px;
+      grid-template-columns: repeat(auto-fill, minmax(92px, 118px));
+      gap: 10px;
+      align-items: start;
     }
     .imgpdf-list:empty { display: none; }
     .imgpdf-item {
       position: relative;
-      display: grid;
-      grid-template-columns: 48px minmax(0,1fr);
-      align-items: center;
-      gap: 8px;
+      display: block;
       min-width: 0;
-      padding: 7px;
+      padding: 5px;
       border: 1px solid var(--line);
-      border-radius: 11px;
+      border-radius: 12px;
       background: #fff;
-      cursor: default;
+      cursor: pointer;
+      overflow: hidden;
+      transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+    .imgpdf-item:hover, .imgpdf-item:focus-visible {
+      transform: translateY(-1px);
+      border-color: #93c5fd;
+      box-shadow: 0 8px 20px rgba(37,99,235,.10);
+      outline: none;
     }
     .imgpdf-thumb {
-      width: 48px;
-      height: 48px;
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      height: auto;
+      display: block;
       border-radius: 8px;
       object-fit: cover;
       background: #f2f4f7;
+    }
+    .imgpdf-item-status {
+      position: absolute;
+      right: 9px;
+      top: 9px;
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: #fff;
+      background: #16a34a;
+      font-size: .72rem;
+      font-weight: 900;
+      box-shadow: 0 3px 10px rgba(0,0,0,.18);
     }
     .imgpdf-name { font-size: .78rem; font-weight: 750; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .imgpdf-meta { color: var(--muted); font-size: .70rem; margin-top: 2px; }
@@ -874,7 +897,7 @@
                 <div class="drop-title">Kéo & thả nhiều ảnh vào đây</div>
                 <div class="drop-help">JPG, JPEG, PNG, WEBP · chọn nhiều ảnh trong một lần</div>
               </div>
-              <button id="imgPdfChooseBtn" class="choose-btn" type="button">Chọn nhiều ảnh</button>
+              <button id="imgPdfChooseBtn" class="choose-btn" type="button">Chọn ảnh</button>
             </div>
             <input id="imgPdfInput" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple />
             <div id="imgPdfList" class="imgpdf-list" aria-live="polite"></div>
@@ -900,7 +923,7 @@
 
 
 <div class="imgpdf-correct-tools">
-  <strong>Cân giấy trước khi xuất:</strong> mỗi ảnh có thể dùng <strong>Tự nhận 4 góc</strong> hoặc <strong>Chấm 4 góc</strong> để nắn lại ảnh chụp bị nghiêng, méo hoặc lệch khung. Nếu tự nhận chưa đúng, hãy dùng chấm tay 4 góc rồi xuất PDF như bình thường.
+  <strong>Nhấp vào thumbnail để cân chỉnh ảnh.</strong>
 </div>
 
           <div class="imgpdf-export-actions">
@@ -926,7 +949,7 @@
         <h4 class="imgpdf-shell-title">Ảnh gốc để chấm / chỉnh 4 góc</h4>
         <div class="imgpdf-editor-wrap"><canvas id="imgPdfEditorCanvas" class="imgpdf-editor-canvas"></canvas></div>
         <div class="imgpdf-editor-toolbar">
-          <button id="imgPdfEditorAutoBtn" class="primary" type="button">Tự nhận 4 góc</button>
+          <button id="imgPdfEditorAutoBtn" class="primary" type="button">Tự cân</button>
           <button id="imgPdfEditorResetBtn" type="button">Làm lại 4 góc</button>
           <button id="imgPdfEditorUndoBtn" type="button">Xóa điểm cuối</button>
           <button id="imgPdfEditorClearBtn" class="warn" type="button">Bỏ cân ảnh này</button>
@@ -2137,12 +2160,23 @@
         try {
           editor.points = autoDetectCornersFromCanvas(editor.sourceCanvas);
           editor.lastDetectionMode = 'auto';
-          setCornerState('Đã tự nhận 4 góc. Bạn có thể phóng to, di chuyển ảnh và chỉnh lại nếu cần.');
+          setCornerState('Đã tự cân 4 góc. Bạn có thể phóng to, di chuyển ảnh và chỉnh lại nếu cần.');
         } catch (err) {
           setCornerState(err?.message || 'Tự nhận 4 góc chưa thành công. Bạn có thể chấm tay 4 góc.', true);
         }
       } else {
-        setCornerState(editor.points.length === 4 ? 'Đã nạp 4 góc đã lưu. Bạn có thể phóng to, di chuyển ảnh rồi kéo/chấm lại nếu cần.' : 'Hãy chấm lần lượt 4 góc: trên trái → trên phải → dưới phải → dưới trái. Có thể phóng to/thu nhỏ và kéo ảnh để chọn chính xác hơn.');
+        if (editor.points.length !== 4) {
+          const insetX = editor.sourceCanvas.width * 0.06;
+          const insetY = editor.sourceCanvas.height * 0.06;
+          editor.points = [
+            { x: insetX, y: insetY },
+            { x: editor.sourceCanvas.width - insetX, y: insetY },
+            { x: editor.sourceCanvas.width - insetX, y: editor.sourceCanvas.height - insetY },
+            { x: insetX, y: editor.sourceCanvas.height - insetY }
+          ];
+          editor.lastDetectionMode = 'manual';
+        }
+        setCornerState('Kéo 4 góc vào đúng mép giấy, hoặc bấm Tự cân. Có thể lăn chuột để zoom và kéo ảnh để di chuyển.');
       }
       renderEditor();
       queuePreview();
@@ -2261,44 +2295,28 @@
   function renderList() {
     list.replaceChildren();
     items.forEach((item, index) => {
-      const row = document.createElement('div');
+      const row = document.createElement('button');
+      row.type = 'button';
       row.className = 'imgpdf-item' + (item.correction?.corners ? ' has-correction' : '');
+      row.title = 'Nhấp để cân chỉnh ảnh';
+      row.setAttribute('aria-label', `Cân chỉnh ảnh ${index + 1}: ${item.file.name}`);
+
       const img = document.createElement('img');
       img.className = 'imgpdf-thumb';
-      img.src = item.url; img.alt = '';
+      img.src = item.url;
+      img.alt = item.file.name;
       img.style.transform = `rotate(${item.rotation}deg)`;
-      const info = document.createElement('div');
-      const name = document.createElement('div');
-      name.className = 'imgpdf-name';
-      name.textContent = item.file.name;
-      const meta = document.createElement('div');
-      meta.className = 'imgpdf-meta';
-      meta.textContent = `${fmt(item.file.size)} · ${index + 1}/${items.length}`;
-      info.append(name, meta);
+      row.appendChild(img);
+
       if (item.correction?.corners) {
-        const badges = document.createElement('div'); badges.className = 'imgpdf-badges';
-        const badge = document.createElement('span');
-        badge.className = 'imgpdf-badge' + (item.correction.method === 'manual' ? ' manual' : '');
-        badge.textContent = item.correction.method === 'manual' ? 'Đã chấm 4 góc' : 'Đã tự nhận 4 góc';
-        badges.appendChild(badge); info.appendChild(badges);
+        const ok = document.createElement('span');
+        ok.className = 'imgpdf-item-status';
+        ok.textContent = '✓';
+        ok.title = 'Đã cân chỉnh';
+        row.appendChild(ok);
       }
-      const actions = document.createElement('div');
-      actions.className = 'imgpdf-actions';
-      const defs = [
-        ['Tự nhận', 'Tự nhận 4 góc rồi xem trước', () => openCornerEditor(index, 'auto')],
-        ['4 góc', 'Mở cửa sổ chấm tay 4 góc', () => openCornerEditor(index, 'manual')],
-        ['↑', 'Đưa lên', () => move(index, -1)],
-        ['↓', 'Đưa xuống', () => move(index, 1)],
-        ['↻', 'Xoay 90°', () => rotate(index)],
-        ['✕', 'Xóa ảnh', () => remove(index)]
-      ];
-      defs.forEach(([txt, title, fn]) => {
-        const b = document.createElement('button');
-        b.type = 'button'; b.className = 'imgpdf-icon-btn'; b.textContent = txt; b.title = title;
-        b.addEventListener('click', e => { e.stopPropagation(); fn(); });
-        actions.appendChild(b);
-      });
-      row.append(img, info, actions);
+
+      row.addEventListener('click', () => openCornerEditor(index, 'manual'));
       list.appendChild(row);
     });
     syncButton();
@@ -2335,7 +2353,7 @@
     }
     files.forEach(file => items.push({ file, rotation: 0, url: URL.createObjectURL(file), correction: null }));
     renderList();
-    setStatus(`Đã chọn ${items.length} ảnh. Thứ tự trong danh sách cũng là thứ tự trang PDF.`);
+    setStatus(`Đã chọn ${items.length} ảnh. Nhấp vào thumbnail để cân chỉnh.`);
   }
 
   async function imageToJpegBytes(item) {
@@ -2539,7 +2557,7 @@
     try {
       editor.points = autoDetectCornersFromCanvas(editor.sourceCanvas);
       editor.lastDetectionMode = 'auto';
-      setCornerState('Đã tự nhận 4 góc. Hãy xem trước rồi bấm Áp dụng.');
+      setCornerState('Đã tự cân 4 góc. Hãy xem trước rồi bấm Áp dụng.');
       renderEditor(); queuePreview();
     } catch (err) {
       setCornerState(err?.message || 'Tự nhận 4 góc chưa thành công. Bạn có thể chấm tay 4 góc.', true);
