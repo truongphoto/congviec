@@ -642,6 +642,119 @@
       .tool-tab { min-height: 44px; font-size: .92rem; }
     }
 
+
+/* BỔ SUNG V4: cân giấy nhẹ cho Ảnh → PDF (auto-detect + chấm 4 góc). */
+.imgpdf-item.has-correction {
+  border-color: #9ac4ef;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+  box-shadow: 0 8px 22px rgba(24, 119, 242, 0.08);
+}
+.imgpdf-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.imgpdf-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 2px 8px; border-radius: 999px; font-size: .68rem; font-weight: 800;
+  background: #e8f2ff; color: #1d4ed8; border: 1px solid #c7ddff;
+}
+.imgpdf-badge.manual { background: #eefdf6; color: #0f766e; border-color: #b8f1db; }
+.imgpdf-correct-tools {
+  margin-top: 10px; padding: 10px 12px; border-radius: 14px; border: 1px dashed rgba(12, 103, 194, 0.22);
+  background: #f8fbff; color: var(--muted); font-size: .82rem; line-height: 1.5;
+}
+.imgpdf-correct-tools strong { color: var(--text); }
+    .imgpdf-actions { flex-wrap: wrap; }
+    .imgpdf-icon-btn { width: auto; min-width: 34px; padding: 0 10px; white-space: nowrap; }
+.imgpdf-modal[hidden] { display: none !important; }
+.imgpdf-modal {
+  position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center;
+  background: rgba(13, 18, 31, 0.55); padding: 14px;
+}
+.imgpdf-dialog {
+  width: min(1080px, calc(100vw - 28px)); max-height: calc(100vh - 28px); overflow: auto;
+  border-radius: 22px; background: #fff; border: 1px solid rgba(15, 23, 42, 0.10);
+  box-shadow: 0 28px 70px rgba(15, 23, 42, 0.30); padding: 16px;
+}
+.imgpdf-dialog-head {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; margin-bottom: 12px;
+}
+.imgpdf-dialog-title { margin: 0; font-size: 1.15rem; font-weight: 850; }
+.imgpdf-dialog-subtitle { margin: 4px 0 0; color: var(--muted); font-size: .88rem; line-height: 1.5; }
+.imgpdf-dialog-close {
+  min-width: 42px; height: 42px; border: 1px solid #d8e0eb; border-radius: 12px; background: #fff;
+  font-size: 1rem; font-weight: 800; color: var(--text); cursor: pointer;
+}
+.imgpdf-corner-layout {
+  display: grid; grid-template-columns: minmax(320px, 1.1fr) minmax(260px, .9fr); gap: 14px; align-items: start;
+}
+.imgpdf-editor-shell, .imgpdf-preview-shell {
+  border: 1px solid rgba(15, 23, 42, 0.08); border-radius: 18px; padding: 12px; background: #fbfdff;
+}
+.imgpdf-shell-title { margin: 0 0 10px; font-size: .93rem; font-weight: 800; color: var(--text); }
+.imgpdf-editor-wrap {
+  position: relative;
+  display: grid; place-items: center; min-height: 320px; border-radius: 14px; border: 1px dashed #cfd9e8;
+  background: repeating-conic-gradient(from 45deg, #f7f9fc 0% 25%, #eef3f9 0% 50%) 50% / 20px 20px;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  cursor: crosshair;
+}
+.imgpdf-editor-wrap.is-pan-ready { cursor: grab; }
+.imgpdf-editor-wrap.is-panning { cursor: grabbing; }
+.imgpdf-editor-wrap.is-dragging-point { cursor: move; }
+.imgpdf-editor-canvas, .imgpdf-preview-canvas {
+  max-width: 100%; max-height: 66vh; display: block; border-radius: 10px; background: #fff;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.12);
+}
+.imgpdf-preview-wrap {
+  display: grid; place-items: center; min-height: 240px; border-radius: 14px; border: 1px dashed #cfd9e8; background: #fff;
+  overflow: auto; padding: 8px;
+}
+.imgpdf-editor-toolbar {
+  margin-top: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;
+}
+.imgpdf-view-tools { margin-top: 8px; }
+.imgpdf-view-state {
+  margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: #eff6ff; color: #1d4ed8;
+  font-size: .82rem; line-height: 1.55; border: 1px solid #c7ddff;
+}
+.imgpdf-view-state strong { color: #0f172a; }
+.imgpdf-editor-toolbar button, .imgpdf-dialog-actions button {
+  min-height: 42px; border-radius: 12px; border: 1px solid #dbe3ef; background: #fff; color: var(--text);
+  font-weight: 800; font-size: .9rem; cursor: pointer;
+}
+.imgpdf-editor-toolbar button.primary, .imgpdf-dialog-actions button.primary {
+  background: linear-gradient(180deg, #1877f2 0%, #0f5ccd 100%); color: #fff; border-color: #0f5ccd;
+}
+.imgpdf-editor-toolbar button.warn {
+  background: #fff7ed; border-color: #fed7aa; color: #9a3412;
+}
+.imgpdf-dialog-actions {
+  display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 14px;
+}
+.imgpdf-corner-steps {
+  margin: 12px 0 0; padding-left: 18px; color: var(--muted); font-size: .84rem; line-height: 1.65;
+}
+.imgpdf-corner-state {
+  margin-top: 10px; min-height: 22px; font-size: .86rem; color: var(--muted); line-height: 1.45;
+}
+.imgpdf-corner-state.error { color: #b42318; }
+.imgpdf-small-note {
+  margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: #f8fafc; color: var(--muted); font-size: .82rem; line-height: 1.55;
+  border: 1px solid #e6edf7;
+}
+@media (max-width: 900px) {
+  .imgpdf-corner-layout { grid-template-columns: 1fr; }
+  .imgpdf-editor-toolbar { grid-template-columns: 1fr 1fr; }
+  .imgpdf-dialog { padding: 14px; }
+}
+@media (max-width: 620px) {
+  .imgpdf-dialog-head { align-items: stretch; flex-direction: column; }
+  .imgpdf-dialog-close { align-self: flex-end; }
+  .imgpdf-editor-toolbar { grid-template-columns: 1fr; }
+  .imgpdf-dialog-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .imgpdf-dialog-actions button { width: 100%; }
+}
+
   </style>
 </head>
 <body>
@@ -785,6 +898,11 @@
             </div>
           </div>
 
+
+<div class="imgpdf-correct-tools">
+  <strong>Cân giấy trước khi xuất:</strong> mỗi ảnh có thể dùng <strong>Tự nhận 4 góc</strong> hoặc <strong>Chấm 4 góc</strong> để nắn lại ảnh chụp bị nghiêng, méo hoặc lệch khung. Nếu tự nhận chưa đúng, hãy dùng chấm tay 4 góc rồi xuất PDF như bình thường.
+</div>
+
           <div class="imgpdf-export-actions">
             <button id="imgPdfSingleBtn" class="compress-btn secondary-export" type="button" disabled>Xuất từng file PDF</button>
             <button id="imgPdfCreateBtn" class="compress-btn" type="button" disabled>Xuất gộp PDF</button>
@@ -793,6 +911,53 @@
         </div>
       </div>
       </div>
+
+<div id="imgPdfCornerModal" class="imgpdf-modal" hidden aria-hidden="true">
+  <div class="imgpdf-dialog" role="dialog" aria-modal="true" aria-labelledby="imgPdfCornerTitle">
+    <div class="imgpdf-dialog-head">
+      <div>
+        <h3 id="imgPdfCornerTitle" class="imgpdf-dialog-title">Cân giấy 4 góc</h3>
+        <p class="imgpdf-dialog-subtitle">Bạn có thể để phần mềm <strong>Tự nhận 4 góc</strong> hoặc <strong>chấm tay 4 góc</strong> theo thứ tự: trên trái → trên phải → dưới phải → dưới trái. Ảnh gốc vẫn được giữ nguyên; chỉ bản xuất PDF dùng ảnh đã cân.</p>
+      </div>
+      <button id="imgPdfCornerCloseTop" class="imgpdf-dialog-close" type="button" aria-label="Đóng">✕</button>
+    </div>
+    <div class="imgpdf-corner-layout">
+      <div class="imgpdf-editor-shell">
+        <h4 class="imgpdf-shell-title">Ảnh gốc để chấm / chỉnh 4 góc</h4>
+        <div class="imgpdf-editor-wrap"><canvas id="imgPdfEditorCanvas" class="imgpdf-editor-canvas"></canvas></div>
+        <div class="imgpdf-editor-toolbar">
+          <button id="imgPdfEditorAutoBtn" class="primary" type="button">Tự nhận 4 góc</button>
+          <button id="imgPdfEditorResetBtn" type="button">Làm lại 4 góc</button>
+          <button id="imgPdfEditorUndoBtn" type="button">Xóa điểm cuối</button>
+          <button id="imgPdfEditorClearBtn" class="warn" type="button">Bỏ cân ảnh này</button>
+        </div>
+        <div class="imgpdf-editor-toolbar imgpdf-view-tools">
+          <button id="imgPdfZoomOutBtn" type="button">− Thu nhỏ</button>
+          <button id="imgPdfZoomInBtn" type="button">＋ Phóng to</button>
+          <button id="imgPdfFitBtn" type="button">Vừa khung</button>
+          <button id="imgPdfResetViewBtn" type="button">Đặt lại khung nhìn</button>
+        </div>
+        <div id="imgPdfViewState" class="imgpdf-view-state">Chuột lăn để <strong>phóng to/thu nhỏ</strong> · kéo nền ảnh để <strong>di chuyển</strong> · kéo các điểm để chỉnh 4 góc.</div>
+        <ol class="imgpdf-corner-steps">
+          <li>Nếu tự nhận đúng, chỉ cần bấm <strong>Áp dụng</strong>.</li>
+          <li>Nếu muốn chấm tay, hãy bấm lần lượt 4 góc: <strong>trên trái → trên phải → dưới phải → dưới trái</strong>.</li>
+          <li>Sau khi đủ 4 điểm, khung xem trước bên phải sẽ tự cập nhật.</li>
+        </ol>
+        <div id="imgPdfCornerState" class="imgpdf-corner-state" aria-live="polite"></div>
+      </div>
+      <div class="imgpdf-preview-shell">
+        <h4 class="imgpdf-shell-title">Xem trước sau khi cân</h4>
+        <div class="imgpdf-preview-wrap"><canvas id="imgPdfPreviewCanvas" class="imgpdf-preview-canvas"></canvas></div>
+        <div class="imgpdf-small-note">Mẹo: nếu tự nhận không chính xác, chỉ cần chấm lại 4 góc. Khi bấm <strong>Bỏ cân ảnh này</strong>, ảnh sẽ trở về xuất PDF theo cách cũ.</div>
+      </div>
+    </div>
+    <div class="imgpdf-dialog-actions">
+      <button id="imgPdfCornerCancelBtn" type="button">Hủy</button>
+      <button id="imgPdfCornerApplyBtn" class="primary" type="button">Áp dụng</button>
+    </div>
+  </div>
+</div>
+
 
     </section>
   </main>
@@ -1432,287 +1597,959 @@
 
   <script>
     // ===== BỔ SUNG ĐỘC LẬP: ẢNH → PDF =====
-    (() => {
-      const panel = document.getElementById('imgPdfPanel');
-      const singleBtn = document.getElementById('imgPdfSingleBtn');
-      const dropzone = document.getElementById('imgPdfDropzone');
-      const chooseBtn = document.getElementById('imgPdfChooseBtn');
-      const input = document.getElementById('imgPdfInput');
-      const list = document.getElementById('imgPdfList');
-      const createBtn = document.getElementById('imgPdfCreateBtn');
-      const status = document.getElementById('imgPdfStatus');
-      const pageSize = document.getElementById('imgPdfPageSize');
-      const margin = document.getElementById('imgPdfMargin');
 
-      let items = [];
-      let busy = false;
-      const ACCEPTED = new Set(['image/jpeg', 'image/png', 'image/webp']);
+(() => {
+  const ACCEPTED = new Set(['image/jpeg', 'image/png', 'image/webp']);
+  const dropzone = document.getElementById('imgPdfDropzone');
+  const chooseBtn = document.getElementById('imgPdfChooseBtn');
+  const input = document.getElementById('imgPdfInput');
+  const list = document.getElementById('imgPdfList');
+  const singleBtn = document.getElementById('imgPdfSingleBtn');
+  const createBtn = document.getElementById('imgPdfCreateBtn');
+  const status = document.getElementById('imgPdfStatus');
+  const pageSize = document.getElementById('imgPdfPageSize');
+  const margin = document.getElementById('imgPdfMargin');
 
-      const fmt = bytes => {
-        if (bytes < 1024) return bytes + ' B';
-        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-        return (bytes / 1024 / 1024).toFixed(2) + ' MB';
-      };
+  const cornerModal = document.getElementById('imgPdfCornerModal');
+  const cornerCloseTop = document.getElementById('imgPdfCornerCloseTop');
+  const cornerCancelBtn = document.getElementById('imgPdfCornerCancelBtn');
+  const cornerApplyBtn = document.getElementById('imgPdfCornerApplyBtn');
+  const cornerAutoBtn = document.getElementById('imgPdfEditorAutoBtn');
+  const cornerResetBtn = document.getElementById('imgPdfEditorResetBtn');
+  const cornerUndoBtn = document.getElementById('imgPdfEditorUndoBtn');
+  const cornerClearBtn = document.getElementById('imgPdfEditorClearBtn');
+  const cornerState = document.getElementById('imgPdfCornerState');
+  const editorCanvas = document.getElementById('imgPdfEditorCanvas');
+  const editorWrap = editorCanvas.parentElement;
+  const previewCanvas = document.getElementById('imgPdfPreviewCanvas');
+  const zoomOutBtn = document.getElementById('imgPdfZoomOutBtn');
+  const zoomInBtn = document.getElementById('imgPdfZoomInBtn');
+  const fitBtn = document.getElementById('imgPdfFitBtn');
+  const resetViewBtn = document.getElementById('imgPdfResetViewBtn');
+  const viewState = document.getElementById('imgPdfViewState');
+  const editorCtx = editorCanvas.getContext('2d', { alpha: false });
+  const previewCtx = previewCanvas.getContext('2d', { alpha: false });
 
-      function setStatus(text, isError = false) {
-        status.textContent = text || '';
-        status.style.color = isError ? 'var(--danger)' : 'var(--muted)';
+  const items = [];
+  let busy = false;
+  const editor = {
+    open: false,
+    index: -1,
+    sourceCanvas: null,
+    displayScale: 1,
+    fitScale: 1,
+    zoom: 1,
+    minZoom: 1,
+    maxZoom: 8,
+    panX: 0,
+    panY: 0,
+    points: [],
+    dragging: -1,
+    panning: false,
+    pointerMode: '',
+    pointerStart: null,
+    pointerCurrent: null,
+    pointerId: null,
+    renderQueued: false,
+    lastFocus: null,
+    lastDetectionMode: 'manual'
+  };
+
+  const fmt = bytes => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+  };
+
+  function setStatus(text, isError = false) {
+    status.textContent = text || '';
+    status.style.color = isError ? 'var(--danger)' : 'var(--muted)';
+  }
+
+  function setCornerState(text, isError = false) {
+    cornerState.textContent = text || '';
+    cornerState.classList.toggle('error', !!isError);
+  }
+
+  function syncButton() {
+    const disabled = busy || items.length === 0;
+    createBtn.disabled = disabled;
+    singleBtn.disabled = disabled;
+    chooseBtn.disabled = busy;
+  }
+
+  function clearItemUrl(item) {
+    if (item?.url) URL.revokeObjectURL(item.url);
+  }
+
+  function polygonSignedArea(points) {
+    let sum = 0;
+    for (let i = 0; i < points.length; i++) {
+      const a = points[i];
+      const b = points[(i + 1) % points.length];
+      sum += a.x * b.y - b.x * a.y;
+    }
+    return sum / 2;
+  }
+
+  function polygonArea(points) {
+    return Math.abs(polygonSignedArea(points));
+  }
+
+  function orderCorners(points) {
+    const pts = points.map(p => ({ x: p.x, y: p.y }));
+    const cx = pts.reduce((s, p) => s + p.x, 0) / pts.length;
+    const cy = pts.reduce((s, p) => s + p.y, 0) / pts.length;
+    pts.sort((a, b) => Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx));
+    const startIdx = pts.reduce((best, p, i, arr) => (p.x + p.y < arr[best].x + arr[best].y ? i : best), 0);
+    const ordered = pts.slice(startIdx).concat(pts.slice(0, startIdx));
+    if (polygonSignedArea(ordered) < 0) ordered.reverse();
+    return [ordered[0], ordered[3], ordered[2], ordered[1]];
+  }
+
+  function normalizeCorners(points, width, height) {
+    return points.map(p => ({ x: p.x / width, y: p.y / height }));
+  }
+
+  function denormalizeCorners(points, width, height) {
+    return points.map(p => ({ x: p.x * width, y: p.y * height }));
+  }
+
+  function distance(a, b) {
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  }
+
+  function validCorners(points, width, height) {
+    if (!points || points.length !== 4) return false;
+    const ordered = orderCorners(points);
+    const area = polygonArea(ordered);
+    if (!isFinite(area) || area < width * height * 0.08) return false;
+    const minX = Math.min(...ordered.map(p => p.x));
+    const maxX = Math.max(...ordered.map(p => p.x));
+    const minY = Math.min(...ordered.map(p => p.y));
+    const maxY = Math.max(...ordered.map(p => p.y));
+    return (maxX - minX) >= width * 0.20 && (maxY - minY) >= height * 0.20;
+  }
+
+  function buildOrientedCanvas(img, rotation = 0) {
+    const swap = rotation === 90 || rotation === 270;
+    const outW = swap ? img.naturalHeight : img.naturalWidth;
+    const outH = swap ? img.naturalWidth : img.naturalHeight;
+    const canvas = document.createElement('canvas');
+    canvas.width = outW;
+    canvas.height = outH;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, outW, outH);
+    ctx.save();
+    ctx.translate(outW / 2, outH / 2);
+    ctx.rotate(rotation * Math.PI / 180);
+    const drawW = swap ? outH : outW;
+    const drawH = swap ? outW : outH;
+    ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+    ctx.restore();
+    return canvas;
+  }
+
+  function scaleCanvas(source, maxSide = 900) {
+    const scale = Math.min(1, maxSide / Math.max(source.width, source.height));
+    if (scale === 1) return { canvas: source, scale: 1 };
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(source.width * scale));
+    canvas.height = Math.max(1, Math.round(source.height * scale));
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+    return { canvas, scale };
+  }
+
+  function loadImage(file) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+      img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không đọc được ảnh: ' + file.name)); };
+      img.src = url;
+    });
+  }
+
+  function sampleBorderLuma(gray, width, height) {
+    const values = [];
+    const margin = Math.max(2, Math.floor(Math.min(width, height) * 0.02));
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (x < margin || y < margin || x >= width - margin || y >= height - margin) values.push(gray[y * width + x]);
       }
+    }
+    values.sort((a, b) => a - b);
+    const median = values[Math.floor(values.length / 2)] || 255;
+    const mean = values.reduce((s, v) => s + v, 0) / Math.max(1, values.length);
+    const variance = values.reduce((s, v) => s + Math.pow(v - mean, 2), 0) / Math.max(1, values.length);
+    return { median, stdev: Math.sqrt(variance) };
+  }
 
-      function syncButton() {
-        const disabled = busy || items.length === 0;
-        createBtn.disabled = disabled;
-        singleBtn.disabled = disabled;
+  function cornersFromMask(points, width, height) {
+    if (!points.length) return null;
+    let tl = points[0], tr = points[0], br = points[0], bl = points[0];
+    for (const p of points) {
+      if (p.x + p.y < tl.x + tl.y) tl = p;
+      if (p.x - p.y > tr.x - tr.y) tr = p;
+      if (p.x + p.y > br.x + br.y) br = p;
+      if (p.y - p.x > bl.y - bl.x) bl = p;
+    }
+    const ordered = orderCorners([tl, tr, br, bl]);
+    return validCorners(ordered, width, height) ? ordered : null;
+  }
+
+  function autoDetectCornersFromCanvas(canvas) {
+    const scaled = scaleCanvas(canvas, 900);
+    const work = scaled.canvas;
+    const w = work.width;
+    const h = work.height;
+    const ctx = work.getContext('2d', { willReadFrequently: true });
+    const { data } = ctx.getImageData(0, 0, w, h);
+    const gray = new Uint8ClampedArray(w * h);
+    for (let i = 0, j = 0; i < data.length; i += 4, j++) {
+      gray[j] = Math.round(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+    }
+
+    const { median, stdev } = sampleBorderLuma(gray, w, h);
+    const maskPoints = [];
+    const xMargin = Math.max(6, Math.floor(w * 0.02));
+    const yMargin = Math.max(6, Math.floor(h * 0.02));
+    const diffThreshold = Math.max(16, stdev * 1.65);
+    for (let y = yMargin; y < h - yMargin; y++) {
+      for (let x = xMargin; x < w - xMargin; x++) {
+        const idx = y * w + x;
+        if (Math.abs(gray[idx] - median) >= diffThreshold) maskPoints.push({ x, y });
       }
+    }
+    let corners = cornersFromMask(maskPoints, w, h);
 
-      function clearItemUrl(item) {
-        if (item.url) URL.revokeObjectURL(item.url);
-      }
-
-      function renderList() {
-        list.replaceChildren();
-        items.forEach((item, index) => {
-          const row = document.createElement('div');
-          row.className = 'imgpdf-item';
-
-          const img = document.createElement('img');
-          img.className = 'imgpdf-thumb';
-          img.src = item.url;
-          img.alt = '';
-          img.style.transform = `rotate(${item.rotation}deg)`;
-
-          const info = document.createElement('div');
-          const name = document.createElement('div');
-          name.className = 'imgpdf-name';
-          name.textContent = item.file.name;
-          const meta = document.createElement('div');
-          meta.className = 'imgpdf-meta';
-          meta.textContent = `${fmt(item.file.size)} · ${index + 1}/${items.length}`;
-          info.append(name, meta);
-
-          const actions = document.createElement('div');
-          actions.className = 'imgpdf-actions';
-          const defs = [
-            ['↑', 'Đưa lên', () => move(index, -1)],
-            ['↓', 'Đưa xuống', () => move(index, 1)],
-            ['↻', 'Xoay 90°', () => rotate(index)],
-            ['✕', 'Xóa ảnh', () => remove(index)]
-          ];
-          defs.forEach(([txt, title, fn]) => {
-            const b = document.createElement('button');
-            b.type = 'button'; b.className = 'imgpdf-icon-btn'; b.textContent = txt; b.title = title;
-            b.addEventListener('click', e => { e.stopPropagation(); fn(); }); actions.appendChild(b);
-          });
-
-          row.append(img, info, actions);
-          list.appendChild(row);
-        });
-        syncButton();
-      }
-
-      function move(index, delta) {
-        const next = index + delta;
-        if (next < 0 || next >= items.length) return;
-        [items[index], items[next]] = [items[next], items[index]];
-        renderList();
-      }
-
-      function rotate(index) {
-        items[index].rotation = (items[index].rotation + 90) % 360;
-        renderList();
-      }
-
-      function remove(index) {
-        const [removed] = items.splice(index, 1);
-        clearItemUrl(removed);
-        renderList();
-        setStatus(items.length ? `Đã chọn ${items.length} ảnh.` : '');
-      }
-
-      function addFiles(fileList) {
-        const files = Array.from(fileList || []).filter(f => ACCEPTED.has(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name));
-        if (!files.length) {
-          setStatus('Không có ảnh JPG, JPEG, PNG hoặc WEBP hợp lệ.', true);
-          return;
+    if (!corners) {
+      const mags = [];
+      let sum = 0, sumSq = 0;
+      for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++) {
+          const idx = y * w + x;
+          const gx = -gray[idx - w - 1] - 2 * gray[idx - 1] - gray[idx + w - 1] + gray[idx - w + 1] + 2 * gray[idx + 1] + gray[idx + w + 1];
+          const gy = -gray[idx - w - 1] - 2 * gray[idx - w] - gray[idx - w + 1] + gray[idx + w - 1] + 2 * gray[idx + w] + gray[idx + w + 1];
+          const mag = Math.abs(gx) + Math.abs(gy);
+          mags.push(mag); sum += mag; sumSq += mag * mag;
         }
-        files.forEach(file => items.push({ file, rotation: 0, url: URL.createObjectURL(file) }));
-        renderList();
-        setStatus(`Đã chọn ${items.length} ảnh. Thứ tự trong danh sách cũng là thứ tự trang PDF.`);
       }
-
-      function loadImage(file) {
-        return new Promise((resolve, reject) => {
-          const url = URL.createObjectURL(file);
-          const img = new Image();
-          img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
-          img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không đọc được ảnh: ' + file.name)); };
-          img.src = url;
-        });
-      }
-
-      async function imageToJpegBytes(item) {
-        const img = await loadImage(item.file);
-        const swap = item.rotation === 90 || item.rotation === 270;
-        const w = swap ? img.naturalHeight : img.naturalWidth;
-        const h = swap ? img.naturalWidth : img.naturalHeight;
-        if (!w || !h) throw new Error('Ảnh không có kích thước hợp lệ: ' + item.file.name);
-
-        const maxSide = 6000;
-        const scale = Math.min(1, maxSide / Math.max(w, h));
-        const outW = Math.max(1, Math.round(w * scale));
-        const outH = Math.max(1, Math.round(h * scale));
-        const canvas = document.createElement('canvas');
-        canvas.width = outW; canvas.height = outH;
-        const ctx = canvas.getContext('2d', { alpha: false });
-        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, outW, outH);
-        ctx.save();
-        ctx.translate(outW / 2, outH / 2);
-        ctx.rotate(item.rotation * Math.PI / 180);
-        const drawW = swap ? outH : outW;
-        const drawH = swap ? outW : outH;
-        ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
-        ctx.restore();
-
-        const blob = await new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('Không chuyển được ảnh.')), 'image/jpeg', 0.94));
-        return { bytes: new Uint8Array(await blob.arrayBuffer()), width: outW, height: outH };
-      }
-
-      function safePdfName(name) {
-        const base = (name || 'anh').replace(/\.[^.]+$/, '').trim() || 'anh';
-        return base.replace(/[\\/:*?"<>|]+/g, '_') + '.pdf';
-      }
-
-      async function buildPdfFromItems(sourceItems) {
-        const pdf = await window.PDFLib.PDFDocument.create();
-        const A4_PORTRAIT = [595.28, 841.89];
-        const m = Number(margin.value) || 0;
-
-        for (let i = 0; i < sourceItems.length; i++) {
-          const converted = await imageToJpegBytes(sourceItems[i]);
-          const embedded = await pdf.embedJpg(converted.bytes);
-          let pw, ph;
-          if (pageSize.value === 'image') {
-            pw = Math.max(72, Math.min(14400, converted.width * 0.75));
-            ph = Math.max(72, Math.min(14400, converted.height * 0.75));
-          } else {
-            const landscape = converted.width > converted.height;
-            [pw, ph] = landscape ? [A4_PORTRAIT[1], A4_PORTRAIT[0]] : A4_PORTRAIT;
-          }
-          const page = pdf.addPage([pw, ph]);
-          const availW = Math.max(1, pw - m * 2);
-          const availH = Math.max(1, ph - m * 2);
-          const scale = Math.min(availW / converted.width, availH / converted.height);
-          const drawW = converted.width * scale;
-          const drawH = converted.height * scale;
-          page.drawImage(embedded, {
-            x: (pw - drawW) / 2, y: (ph - drawH) / 2, width: drawW, height: drawH
-          });
+      const mean = sum / Math.max(1, mags.length);
+      const std = Math.sqrt(Math.max(0, sumSq / Math.max(1, mags.length) - mean * mean));
+      const threshold = mean + std * 1.35;
+      const edgePoints = [];
+      let p = 0;
+      for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++, p++) {
+          if (mags[p] >= threshold) edgePoints.push({ x, y });
         }
-        return pdf.save({ useObjectStreams: true });
       }
+      corners = cornersFromMask(edgePoints, w, h);
+    }
 
-      function downloadPdfBytes(bytes, filename) {
-        const blob = new Blob([bytes], { type: 'application/pdf' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = filename;
-        document.body.appendChild(a); a.click(); a.remove();
-        setTimeout(() => URL.revokeObjectURL(url), 30000);
+    if (!corners) throw new Error('Auto-detect chưa nhận chắc chắn được 4 góc. Hãy dùng Chấm 4 góc.');
+    return corners.map(p => ({ x: p.x / scaled.scale, y: p.y / scaled.scale }));
+  }
+
+  function solveLinearSystem(matrix) {
+    const m = matrix.map(row => row.slice());
+    const rows = m.length;
+    const cols = m[0].length;
+    for (let col = 0; col < rows; col++) {
+      let pivot = col;
+      for (let r = col + 1; r < rows; r++) if (Math.abs(m[r][col]) > Math.abs(m[pivot][col])) pivot = r;
+      if (Math.abs(m[pivot][col]) < 1e-8) throw new Error('Không thể tính ma trận phối cảnh.');
+      if (pivot !== col) [m[pivot], m[col]] = [m[col], m[pivot]];
+      const factor = m[col][col];
+      for (let c = col; c < cols; c++) m[col][c] /= factor;
+      for (let r = 0; r < rows; r++) {
+        if (r === col) continue;
+        const scale = m[r][col];
+        for (let c = col; c < cols; c++) m[r][c] -= scale * m[col][c];
       }
+    }
+    return m.map(row => row[cols - 1]);
+  }
 
-      async function createSinglePdfs() {
-        if (busy || !items.length) return;
-        if (!window.PDFLib?.PDFDocument) {
-          setStatus('Thư viện PDF chưa tải xong. Hãy kiểm tra Internet rồi thử lại.', true);
-          return;
+  function computeHomography(srcPts, dstPts) {
+    const A = [];
+    for (let i = 0; i < 4; i++) {
+      const x = srcPts[i].x, y = srcPts[i].y;
+      const u = dstPts[i].x, v = dstPts[i].y;
+      A.push([x, y, 1, 0, 0, 0, -u * x, -u * y, u]);
+      A.push([0, 0, 0, x, y, 1, -v * x, -v * y, v]);
+    }
+    const h = solveLinearSystem(A);
+    return [h[0], h[1], h[2], h[3], h[4], h[5], h[6], h[7], 1];
+  }
+
+  function projectPoint(H, x, y) {
+    const den = H[6] * x + H[7] * y + H[8];
+    return { x: (H[0] * x + H[1] * y + H[2]) / den, y: (H[3] * x + H[4] * y + H[5]) / den };
+  }
+
+  function bilinearSample(srcData, width, height, x, y) {
+    const x0 = Math.max(0, Math.min(width - 1, Math.floor(x)));
+    const y0 = Math.max(0, Math.min(height - 1, Math.floor(y)));
+    const x1 = Math.max(0, Math.min(width - 1, x0 + 1));
+    const y1 = Math.max(0, Math.min(height - 1, y0 + 1));
+    const dx = x - x0;
+    const dy = y - y0;
+    const idx00 = (y0 * width + x0) * 4;
+    const idx10 = (y0 * width + x1) * 4;
+    const idx01 = (y1 * width + x0) * 4;
+    const idx11 = (y1 * width + x1) * 4;
+    const out = [0, 0, 0, 255];
+    for (let c = 0; c < 3; c++) {
+      const v00 = srcData[idx00 + c], v10 = srcData[idx10 + c], v01 = srcData[idx01 + c], v11 = srcData[idx11 + c];
+      const v0 = v00 + (v10 - v00) * dx;
+      const v1 = v01 + (v11 - v01) * dx;
+      out[c] = Math.round(v0 + (v1 - v0) * dy);
+    }
+    return out;
+  }
+
+  function warpPerspectiveCanvas(sourceCanvas, corners) {
+    const ordered = orderCorners(corners);
+    if (!validCorners(ordered, sourceCanvas.width, sourceCanvas.height)) throw new Error('4 góc chưa hợp lệ để cân ảnh.');
+    const outW = Math.max(32, Math.round((distance(ordered[0], ordered[1]) + distance(ordered[3], ordered[2])) / 2));
+    const outH = Math.max(32, Math.round((distance(ordered[0], ordered[3]) + distance(ordered[1], ordered[2])) / 2));
+    const outCanvas = document.createElement('canvas');
+    outCanvas.width = outW; outCanvas.height = outH;
+    const outCtx = outCanvas.getContext('2d', { alpha: false });
+    outCtx.fillStyle = '#fff'; outCtx.fillRect(0, 0, outW, outH);
+    const srcCtx = sourceCanvas.getContext('2d', { willReadFrequently: true });
+    const srcData = srcCtx.getImageData(0, 0, sourceCanvas.width, sourceCanvas.height).data;
+    const outImage = outCtx.createImageData(outW, outH);
+    const H = computeHomography([
+      { x: 0, y: 0 },
+      { x: outW - 1, y: 0 },
+      { x: outW - 1, y: outH - 1 },
+      { x: 0, y: outH - 1 }
+    ], ordered);
+    for (let y = 0; y < outH; y++) {
+      for (let x = 0; x < outW; x++) {
+        const src = projectPoint(H, x, y);
+        const outIdx = (y * outW + x) * 4;
+        if (src.x < 0 || src.y < 0 || src.x >= sourceCanvas.width || src.y >= sourceCanvas.height) {
+          outImage.data[outIdx] = 255; outImage.data[outIdx + 1] = 255; outImage.data[outIdx + 2] = 255; outImage.data[outIdx + 3] = 255;
+        } else {
+          const px = bilinearSample(srcData, sourceCanvas.width, sourceCanvas.height, src.x, src.y);
+          outImage.data[outIdx] = px[0]; outImage.data[outIdx + 1] = px[1]; outImage.data[outIdx + 2] = px[2]; outImage.data[outIdx + 3] = 255;
         }
-        busy = true; syncButton();
+      }
+    }
+    outCtx.putImageData(outImage, 0, 0);
+    return outCanvas;
+  }
+
+
+  function getActualScale() {
+    return editor.fitScale * editor.zoom;
+  }
+
+  function clampPan() {
+    if (!editor.sourceCanvas) return;
+    const scaledW = editor.sourceCanvas.width * getActualScale();
+    const scaledH = editor.sourceCanvas.height * getActualScale();
+    if (scaledW <= editorCanvas.width) {
+      editor.panX = (editorCanvas.width - scaledW) / 2;
+    } else {
+      const minX = editorCanvas.width - scaledW;
+      editor.panX = Math.min(0, Math.max(minX, editor.panX));
+    }
+    if (scaledH <= editorCanvas.height) {
+      editor.panY = (editorCanvas.height - scaledH) / 2;
+    } else {
+      const minY = editorCanvas.height - scaledH;
+      editor.panY = Math.min(0, Math.max(minY, editor.panY));
+    }
+  }
+
+  function resetViewport(keepZoom = false) {
+    if (!editor.sourceCanvas) return;
+    const wrapRect = editorWrap.getBoundingClientRect();
+    const maxW = Math.max(320, Math.min(window.innerWidth * 0.58, 760, wrapRect.width || 760));
+    const maxH = Math.max(320, Math.min(window.innerHeight * 0.62, 680, window.innerHeight - 260));
+    editorCanvas.width = Math.max(320, Math.round(maxW));
+    editorCanvas.height = Math.max(260, Math.round(maxH));
+    const newFit = Math.min(editorCanvas.width / editor.sourceCanvas.width, editorCanvas.height / editor.sourceCanvas.height);
+    const focusSource = keepZoom ? { x: (editorCanvas.width / 2 - editor.panX) / Math.max(0.0001, getActualScale()), y: (editorCanvas.height / 2 - editor.panY) / Math.max(0.0001, getActualScale()) } : null;
+    editor.fitScale = newFit;
+    editor.minZoom = 1;
+    if (!keepZoom || !Number.isFinite(editor.zoom)) editor.zoom = 1;
+    if (focusSource) {
+      const actualScale = getActualScale();
+      editor.panX = editorCanvas.width / 2 - focusSource.x * actualScale;
+      editor.panY = editorCanvas.height / 2 - focusSource.y * actualScale;
+    } else {
+      const actualScale = getActualScale();
+      editor.panX = (editorCanvas.width - editor.sourceCanvas.width * actualScale) / 2;
+      editor.panY = (editorCanvas.height - editor.sourceCanvas.height * actualScale) / 2;
+    }
+    clampPan();
+    updateViewState();
+  }
+
+  function sourceToCanvasPoint(pt) {
+    const scale = getActualScale();
+    return { x: pt.x * scale + editor.panX, y: pt.y * scale + editor.panY };
+  }
+
+  function canvasToSourcePoint(pt) {
+    const scale = getActualScale();
+    return {
+      x: Math.max(0, Math.min(editor.sourceCanvas.width, (pt.x - editor.panX) / scale)),
+      y: Math.max(0, Math.min(editor.sourceCanvas.height, (pt.y - editor.panY) / scale))
+    };
+  }
+
+  function isPointInsideImage(canvasPoint) {
+    const sourcePt = canvasToSourcePoint(canvasPoint);
+    return sourcePt.x >= 0 && sourcePt.y >= 0 && sourcePt.x <= editor.sourceCanvas.width && sourcePt.y <= editor.sourceCanvas.height;
+  }
+
+  function setZoom(nextZoom, focusCanvasPoint = null) {
+    if (!editor.sourceCanvas) return;
+    const oldScale = getActualScale();
+    const focus = focusCanvasPoint || { x: editorCanvas.width / 2, y: editorCanvas.height / 2 };
+    const focusSource = {
+      x: (focus.x - editor.panX) / oldScale,
+      y: (focus.y - editor.panY) / oldScale
+    };
+    editor.zoom = Math.max(editor.minZoom, Math.min(editor.maxZoom, nextZoom));
+    const newScale = getActualScale();
+    editor.panX = focus.x - focusSource.x * newScale;
+    editor.panY = focus.y - focusSource.y * newScale;
+    clampPan();
+    updateViewState();
+    renderEditor();
+  }
+
+  function updateViewState() {
+    if (!viewState) return;
+    const zoomPercent = Math.round(editor.zoom * 100);
+    viewState.innerHTML = `Chuột lăn để <strong>phóng to/thu nhỏ</strong> · kéo nền ảnh để <strong>di chuyển</strong> · kéo các điểm để chỉnh 4 góc · <strong>Zoom ${zoomPercent}%</strong>`;
+  }
+
+  function setWrapCursorState(state) {
+    editorWrap.classList.toggle('is-panning', state === 'panning');
+    editorWrap.classList.toggle('is-dragging-point', state === 'point');
+    editorWrap.classList.toggle('is-pan-ready', state === 'pan-ready' || state === 'panning');
+  }
+
+  function renderEditor() {
+    if (!editor.open || !editor.sourceCanvas) return;
+    if (!editorCanvas.width || !editorCanvas.height) resetViewport(false);
+    const scale = getActualScale();
+    editor.displayScale = scale;
+    editorCtx.fillStyle = '#f8fbff';
+    editorCtx.fillRect(0, 0, editorCanvas.width, editorCanvas.height);
+    editorCtx.drawImage(editor.sourceCanvas, editor.panX, editor.panY, editor.sourceCanvas.width * scale, editor.sourceCanvas.height * scale);
+    if (!editor.points.length) return;
+    editorCtx.save();
+    editorCtx.lineWidth = Math.max(2, Math.round(Math.min(editorCanvas.width, editorCanvas.height) / 220));
+    editorCtx.strokeStyle = '#1877f2';
+    editorCtx.fillStyle = 'rgba(24, 119, 242, 0.18)';
+    editorCtx.beginPath();
+    editor.points.forEach((pt, idx) => {
+      const mapped = sourceToCanvasPoint(pt);
+      if (idx === 0) editorCtx.moveTo(mapped.x, mapped.y); else editorCtx.lineTo(mapped.x, mapped.y);
+    });
+    if (editor.points.length === 4) editorCtx.closePath();
+    editorCtx.stroke();
+    if (editor.points.length >= 3) editorCtx.fill();
+    const radius = Math.max(9, Math.min(editorCanvas.width, editorCanvas.height) * 0.015);
+    editor.points.forEach((pt, idx) => {
+      const mapped = sourceToCanvasPoint(pt);
+      editorCtx.beginPath();
+      editorCtx.fillStyle = '#fff';
+      editorCtx.arc(mapped.x, mapped.y, radius, 0, Math.PI * 2);
+      editorCtx.fill();
+      editorCtx.strokeStyle = '#1877f2';
+      editorCtx.stroke();
+      editorCtx.fillStyle = '#0f172a';
+      editorCtx.font = `${Math.max(12, Math.round(radius * 1.4))}px system-ui, sans-serif`;
+      editorCtx.textAlign = 'center';
+      editorCtx.textBaseline = 'middle';
+      editorCtx.fillText(String(idx + 1), mapped.x, mapped.y);
+    });
+    editorCtx.restore();
+  }
+
+  function queuePreview() {
+    if (editor.renderQueued) return;
+    editor.renderQueued = true;
+    requestAnimationFrame(() => { editor.renderQueued = false; renderPreview(); });
+  }
+
+  function renderPreview() {
+    if (!editor.sourceCanvas || editor.points.length !== 4 || !validCorners(editor.points, editor.sourceCanvas.width, editor.sourceCanvas.height)) {
+      previewCanvas.width = 360; previewCanvas.height = 240;
+      previewCtx.fillStyle = '#fff'; previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewCtx.fillStyle = '#64748b'; previewCtx.font = '600 16px system-ui, sans-serif';
+      previewCtx.textAlign = 'center'; previewCtx.textBaseline = 'middle';
+      previewCtx.fillText('Khi đủ 4 góc hợp lệ, xem trước sẽ hiện ở đây.', previewCanvas.width / 2, previewCanvas.height / 2);
+      return;
+    }
+    try {
+      const corrected = warpPerspectiveCanvas(editor.sourceCanvas, editor.points);
+      const scaled = scaleCanvas(corrected, 540).canvas;
+      previewCanvas.width = scaled.width; previewCanvas.height = scaled.height;
+      previewCtx.fillStyle = '#fff'; previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewCtx.drawImage(scaled, 0, 0);
+      setCornerState(`Đã có xem trước sau khi cân · ${Math.round(corrected.width)} × ${Math.round(corrected.height)} px.`);
+    } catch (err) {
+      previewCanvas.width = 360; previewCanvas.height = 240;
+      previewCtx.fillStyle = '#fff'; previewCtx.fillRect(0, 0, previewCanvas.width, previewCanvas.height);
+      previewCtx.fillStyle = '#b42318'; previewCtx.font = '600 14px system-ui, sans-serif';
+      previewCtx.textAlign = 'center'; previewCtx.textBaseline = 'middle';
+      previewCtx.fillText('Không thể tạo xem trước. Hãy chấm lại 4 góc.', previewCanvas.width / 2, previewCanvas.height / 2);
+      setCornerState(err?.message || 'Không thể tạo xem trước.', true);
+    }
+  }
+
+  async function openCornerEditor(index, mode = 'manual') {
+    const item = items[index];
+    if (!item || busy) return;
+    try {
+      const img = await loadImage(item.file);
+      editor.open = true;
+      editor.index = index;
+      editor.sourceCanvas = buildOrientedCanvas(img, item.rotation);
+      editor.lastFocus = document.activeElement;
+      editor.points = item.correction?.corners ? denormalizeCorners(item.correction.corners, editor.sourceCanvas.width, editor.sourceCanvas.height) : [];
+      editor.lastDetectionMode = item.correction?.method || 'manual';
+      editor.dragging = -1;
+      editor.panning = false;
+      editor.pointerMode = '';
+      editor.pointerStart = null;
+      editor.pointerCurrent = null;
+      editor.pointerId = null;
+      cornerModal.hidden = false;
+      cornerModal.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      resetViewport(false);
+      if (mode === 'auto') {
         try {
-          for (let i = 0; i < items.length; i++) {
-            setStatus(`Đang xuất file ${i + 1}/${items.length}: ${items[i].file.name}`);
-            const bytes = await buildPdfFromItems([items[i]]);
-            downloadPdfBytes(bytes, safePdfName(items[i].file.name));
-          }
-          setStatus(`Hoàn tất: đã xuất ${items.length} file PDF riêng. Nếu trình duyệt hỏi, hãy cho phép tải nhiều file.`);
+          editor.points = autoDetectCornersFromCanvas(editor.sourceCanvas);
+          editor.lastDetectionMode = 'auto';
+          setCornerState('Đã tự nhận 4 góc. Bạn có thể phóng to, di chuyển ảnh và chỉnh lại nếu cần.');
         } catch (err) {
-          console.error(err);
-          setStatus('Không thể xuất PDF riêng. Chi tiết: ' + (err?.message || String(err)), true);
-        } finally {
-          busy = false; syncButton();
+          setCornerState(err?.message || 'Tự nhận 4 góc chưa thành công. Bạn có thể chấm tay 4 góc.', true);
         }
+      } else {
+        setCornerState(editor.points.length === 4 ? 'Đã nạp 4 góc đã lưu. Bạn có thể phóng to, di chuyển ảnh rồi kéo/chấm lại nếu cần.' : 'Hãy chấm lần lượt 4 góc: trên trái → trên phải → dưới phải → dưới trái. Có thể phóng to/thu nhỏ và kéo ảnh để chọn chính xác hơn.');
       }
+      renderEditor();
+      queuePreview();
+      setWrapCursorState('pan-ready');
+    } catch (err) {
+      console.error(err);
+      setStatus('Không thể mở ảnh để cân. Chi tiết: ' + (err?.message || String(err)), true);
+    }
+  }
 
-      async function createPdf() {
-        if (busy || !items.length) return;
-        if (!window.PDFLib?.PDFDocument) {
-          setStatus('Thư viện PDF chưa tải xong. Hãy kiểm tra Internet rồi thử lại.', true);
-          return;
-        }
-        busy = true; syncButton(); setStatus('Đang tạo PDF…');
-        try {
-          for (let i = 0; i < items.length; i++) {
-            setStatus(`Đang xử lý ảnh ${i + 1}/${items.length}: ${items[i].file.name}`);
-          }
-          const bytes = await buildPdfFromItems(items);
-          downloadPdfBytes(bytes, `anh-sang-pdf-${new Date().toISOString().slice(0,10)}.pdf`);
-          setStatus(`Hoàn tất: ${items.length} ảnh → 1 PDF (${fmt(bytes.byteLength)}).`);
-        } catch (err) {
-          console.error(err);
-          setStatus('Không thể tạo PDF. Chi tiết: ' + (err?.message || String(err)), true);
-        } finally {
-          busy = false; syncButton();
-        }
+  function closeCornerEditor() {
+    if (!editor.open) return;
+    editor.open = false;
+    editor.index = -1;
+    editor.sourceCanvas = null;
+    editor.points = [];
+    editor.dragging = -1;
+    editor.panning = false;
+    editor.pointerMode = '';
+    editor.pointerStart = null;
+    editor.pointerCurrent = null;
+    editor.pointerId = null;
+    cornerModal.hidden = true;
+    cornerModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    setCornerState('');
+    setWrapCursorState('');
+    if (editor.lastFocus && typeof editor.lastFocus.focus === 'function') editor.lastFocus.focus();
+  }
+
+  function getCanvasPoint(evt) {
+    const rect = editorCanvas.getBoundingClientRect();
+    const x = (evt.clientX - rect.left) * (editorCanvas.width / rect.width);
+    const y = (evt.clientY - rect.top) * (editorCanvas.height / rect.height);
+    return { x: Math.max(0, Math.min(editorCanvas.width, x)), y: Math.max(0, Math.min(editorCanvas.height, y)) };
+  }
+
+  function findNearestPoint(canvasPoint) {
+    const radius = Math.max(12, Math.min(editorCanvas.width, editorCanvas.height) * 0.02);
+    let best = -1, bestDist = Infinity;
+    editor.points.forEach((pt, idx) => {
+      const mapped = sourceToCanvasPoint(pt);
+      const dx = mapped.x - canvasPoint.x;
+      const dy = mapped.y - canvasPoint.y;
+      const d = Math.hypot(dx, dy);
+      if (d < radius && d < bestDist) { best = idx; bestDist = d; }
+    });
+    return best;
+  }
+
+  function beginDrag(evt) {
+    if (!editor.open || !editor.sourceCanvas) return;
+    const canvasPt = getCanvasPoint(evt);
+    const nearest = findNearestPoint(canvasPt);
+    editor.pointerId = evt.pointerId;
+    editor.pointerStart = { x: canvasPt.x, y: canvasPt.y, panX: editor.panX, panY: editor.panY };
+    editor.pointerCurrent = { x: canvasPt.x, y: canvasPt.y };
+    if (nearest >= 0) {
+      editor.dragging = nearest;
+      editor.pointerMode = 'point';
+      editor.lastDetectionMode = 'manual';
+      editor.points[nearest] = canvasToSourcePoint(canvasPt);
+      setWrapCursorState('point');
+      renderEditor(); queuePreview();
+      evt.preventDefault();
+      return;
+    }
+    editor.pointerMode = 'pending';
+    setWrapCursorState('pan-ready');
+    try { editorCanvas.setPointerCapture(evt.pointerId); } catch (_) {}
+    evt.preventDefault();
+  }
+
+  function dragMove(evt) {
+    if (!editor.open || editor.pointerId !== evt.pointerId || !editor.pointerMode) return;
+    const canvasPt = getCanvasPoint(evt);
+    editor.pointerCurrent = { x: canvasPt.x, y: canvasPt.y };
+    if (editor.pointerMode === 'point' && editor.dragging >= 0) {
+      editor.lastDetectionMode = 'manual';
+      editor.points[editor.dragging] = canvasToSourcePoint(canvasPt);
+      setWrapCursorState('point');
+      renderEditor(); queuePreview();
+      evt.preventDefault();
+      return;
+    }
+    const moved = Math.hypot(canvasPt.x - editor.pointerStart.x, canvasPt.y - editor.pointerStart.y);
+    if (moved > 4) editor.pointerMode = 'pan';
+    if (editor.pointerMode === 'pan') {
+      editor.panX = editor.pointerStart.panX + (canvasPt.x - editor.pointerStart.x);
+      editor.panY = editor.pointerStart.panY + (canvasPt.y - editor.pointerStart.y);
+      clampPan();
+      setWrapCursorState('panning');
+      renderEditor();
+      evt.preventDefault();
+    }
+  }
+
+  function endDrag(evt) {
+    if (editor.pointerId != null && evt && editor.pointerId !== evt.pointerId) return;
+    if (!editor.open) return;
+    if (editor.pointerMode === 'pending' && editor.pointerCurrent && editor.points.length < 4) {
+      editor.lastDetectionMode = 'manual';
+      editor.points.push(canvasToSourcePoint(editor.pointerCurrent));
+      renderEditor(); queuePreview();
+      setCornerState(editor.points.length < 4 ? `Đã chấm ${editor.points.length}/4 góc. Tiếp tục chấm theo thứ tự: trên trái → trên phải → dưới phải → dưới trái.` : 'Đã đủ 4 góc. Hãy xem trước bên phải rồi bấm Áp dụng.');
+    }
+    editor.dragging = -1;
+    editor.panning = false;
+    editor.pointerMode = '';
+    editor.pointerStart = null;
+    editor.pointerCurrent = null;
+    editor.pointerId = null;
+    setWrapCursorState('pan-ready');
+  }
+
+  function renderList() {
+    list.replaceChildren();
+    items.forEach((item, index) => {
+      const row = document.createElement('div');
+      row.className = 'imgpdf-item' + (item.correction?.corners ? ' has-correction' : '');
+      const img = document.createElement('img');
+      img.className = 'imgpdf-thumb';
+      img.src = item.url; img.alt = '';
+      img.style.transform = `rotate(${item.rotation}deg)`;
+      const info = document.createElement('div');
+      const name = document.createElement('div');
+      name.className = 'imgpdf-name';
+      name.textContent = item.file.name;
+      const meta = document.createElement('div');
+      meta.className = 'imgpdf-meta';
+      meta.textContent = `${fmt(item.file.size)} · ${index + 1}/${items.length}`;
+      info.append(name, meta);
+      if (item.correction?.corners) {
+        const badges = document.createElement('div'); badges.className = 'imgpdf-badges';
+        const badge = document.createElement('span');
+        badge.className = 'imgpdf-badge' + (item.correction.method === 'manual' ? ' manual' : '');
+        badge.textContent = item.correction.method === 'manual' ? 'Đã chấm 4 góc' : 'Đã tự nhận 4 góc';
+        badges.appendChild(badge); info.appendChild(badges);
       }
-
-      async function openMultiImagePicker() {
-        // Chromium/Cốc Cốc: yêu cầu bộ chọn file ở chế độ multiple thật sự.
-        if (window.showOpenFilePicker && window.isSecureContext) {
-          try {
-            const handles = await window.showOpenFilePicker({
-              multiple: true,
-              types: [{
-                description: 'Ảnh',
-                accept: {
-                  'image/jpeg': ['.jpg', '.jpeg'],
-                  'image/png': ['.png'],
-                  'image/webp': ['.webp']
-                }
-              }]
-            });
-            const files = [];
-            for (const handle of handles) files.push(await handle.getFile());
-            addFiles(files);
-            return;
-          } catch (err) {
-            if (err?.name === 'AbortError') return;
-            console.warn('showOpenFilePicker fallback:', err);
-          }
-        }
-        // Fallback chuẩn HTML: input có thuộc tính multiple.
-        input.multiple = true;
-        input.click();
-      }
-
-      chooseBtn.addEventListener('click', e => { e.stopPropagation(); openMultiImagePicker(); });
-      dropzone.addEventListener('click', e => {
-        if (e.target.closest('.imgpdf-item') || e.target.closest('.choose-btn')) return;
-        openMultiImagePicker();
+      const actions = document.createElement('div');
+      actions.className = 'imgpdf-actions';
+      const defs = [
+        ['Tự nhận', 'Tự nhận 4 góc rồi xem trước', () => openCornerEditor(index, 'auto')],
+        ['4 góc', 'Mở cửa sổ chấm tay 4 góc', () => openCornerEditor(index, 'manual')],
+        ['↑', 'Đưa lên', () => move(index, -1)],
+        ['↓', 'Đưa xuống', () => move(index, 1)],
+        ['↻', 'Xoay 90°', () => rotate(index)],
+        ['✕', 'Xóa ảnh', () => remove(index)]
+      ];
+      defs.forEach(([txt, title, fn]) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'imgpdf-icon-btn'; b.textContent = txt; b.title = title;
+        b.addEventListener('click', e => { e.stopPropagation(); fn(); });
+        actions.appendChild(b);
       });
-      dropzone.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMultiImagePicker(); }
-      });
-      input.addEventListener('change', () => { addFiles(input.files); input.value = ''; });
-      ['dragenter','dragover'].forEach(name => dropzone.addEventListener(name, e => {
-        e.preventDefault(); e.stopPropagation(); dropzone.classList.add('dragover');
-      }));
-      ['dragleave','drop'].forEach(name => dropzone.addEventListener(name, e => {
-        e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dragover');
-      }));
-      dropzone.addEventListener('drop', e => addFiles(e.dataTransfer?.files));
-      singleBtn.addEventListener('click', createSinglePdfs);
-      createBtn.addEventListener('click', createPdf);
-      window.addEventListener('beforeunload', () => items.forEach(clearItemUrl));
-    })();
+      row.append(img, info, actions);
+      list.appendChild(row);
+    });
+    syncButton();
+  }
+
+  function move(index, delta) {
+    const next = index + delta;
+    if (next < 0 || next >= items.length) return;
+    [items[index], items[next]] = [items[next], items[index]];
+    renderList();
+  }
+
+  function rotate(index) {
+    items[index].rotation = (items[index].rotation + 90) % 360;
+    if (items[index].correction?.corners) {
+      items[index].correction = null;
+      setStatus('Đã xoay ảnh và tự bỏ cân 4 góc cũ để tránh sai lệch.');
+    }
+    renderList();
+  }
+
+  function remove(index) {
+    const [removed] = items.splice(index, 1);
+    clearItemUrl(removed);
+    renderList();
+    setStatus(items.length ? `Đã chọn ${items.length} ảnh.` : '');
+  }
+
+  function addFiles(fileList) {
+    const files = Array.from(fileList || []).filter(f => ACCEPTED.has(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name));
+    if (!files.length) {
+      setStatus('Không có ảnh JPG, JPEG, PNG hoặc WEBP hợp lệ.', true);
+      return;
+    }
+    files.forEach(file => items.push({ file, rotation: 0, url: URL.createObjectURL(file), correction: null }));
+    renderList();
+    setStatus(`Đã chọn ${items.length} ảnh. Thứ tự trong danh sách cũng là thứ tự trang PDF.`);
+  }
+
+  async function imageToJpegBytes(item) {
+    const img = await loadImage(item.file);
+    let workingCanvas = buildOrientedCanvas(img, item.rotation);
+    if (item.correction?.corners?.length === 4) {
+      const corners = denormalizeCorners(item.correction.corners, workingCanvas.width, workingCanvas.height);
+      workingCanvas = warpPerspectiveCanvas(workingCanvas, corners);
+    }
+    const maxSide = 6000;
+    const scale = Math.min(1, maxSide / Math.max(workingCanvas.width, workingCanvas.height));
+    const outW = Math.max(1, Math.round(workingCanvas.width * scale));
+    const outH = Math.max(1, Math.round(workingCanvas.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = outW; canvas.height = outH;
+    const ctx = canvas.getContext('2d', { alpha: false });
+    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, outW, outH);
+    ctx.drawImage(workingCanvas, 0, 0, outW, outH);
+    const blob = await new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('Không chuyển được ảnh.')), 'image/jpeg', 0.94));
+    return { bytes: new Uint8Array(await blob.arrayBuffer()), width: outW, height: outH };
+  }
+
+  function safePdfName(name) {
+    const base = (name || 'anh').replace(/\.[^.]+$/, '').trim() || 'anh';
+    return base.replace(/[\/:*?"<>|]+/g, '_') + '.pdf';
+  }
+
+  async function buildPdfFromItems(sourceItems) {
+    const pdf = await window.PDFLib.PDFDocument.create();
+    const A4_PORTRAIT = [595.28, 841.89];
+    const m = Number(margin.value) || 0;
+    for (let i = 0; i < sourceItems.length; i++) {
+      const converted = await imageToJpegBytes(sourceItems[i]);
+      const embedded = await pdf.embedJpg(converted.bytes);
+      let pw, ph;
+      if (pageSize.value === 'image') {
+        pw = Math.max(72, Math.min(14400, converted.width * 0.75));
+        ph = Math.max(72, Math.min(14400, converted.height * 0.75));
+      } else {
+        const landscape = converted.width > converted.height;
+        [pw, ph] = landscape ? [A4_PORTRAIT[1], A4_PORTRAIT[0]] : A4_PORTRAIT;
+      }
+      const page = pdf.addPage([pw, ph]);
+      const availW = Math.max(1, pw - m * 2);
+      const availH = Math.max(1, ph - m * 2);
+      const scale = Math.min(availW / converted.width, availH / converted.height);
+      const drawW = converted.width * scale;
+      const drawH = converted.height * scale;
+      page.drawImage(embedded, { x: (pw - drawW) / 2, y: (ph - drawH) / 2, width: drawW, height: drawH });
+    }
+    return pdf.save({ useObjectStreams: true });
+  }
+
+  function downloadPdfBytes(bytes, filename) {
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  }
+
+  async function createSinglePdfs() {
+    if (busy || !items.length) return;
+    if (!window.PDFLib?.PDFDocument) {
+      setStatus('Thư viện PDF chưa tải xong. Hãy kiểm tra Internet rồi thử lại.', true);
+      return;
+    }
+    busy = true; syncButton();
+    try {
+      for (let i = 0; i < items.length; i++) {
+        setStatus(`Đang xuất file ${i + 1}/${items.length}: ${items[i].file.name}`);
+        const bytes = await buildPdfFromItems([items[i]]);
+        downloadPdfBytes(bytes, safePdfName(items[i].file.name));
+      }
+      setStatus(`Hoàn tất: đã xuất ${items.length} file PDF riêng. Nếu trình duyệt hỏi, hãy cho phép tải nhiều file.`);
+    } catch (err) {
+      console.error(err);
+      setStatus('Không thể xuất PDF riêng. Chi tiết: ' + (err?.message || String(err)), true);
+    } finally {
+      busy = false; syncButton();
+    }
+  }
+
+  async function createPdf() {
+    if (busy || !items.length) return;
+    if (!window.PDFLib?.PDFDocument) {
+      setStatus('Thư viện PDF chưa tải xong. Hãy kiểm tra Internet rồi thử lại.', true);
+      return;
+    }
+    busy = true; syncButton(); setStatus('Đang tạo PDF…');
+    try {
+      for (let i = 0; i < items.length; i++) setStatus(`Đang xử lý ảnh ${i + 1}/${items.length}: ${items[i].file.name}`);
+      const bytes = await buildPdfFromItems(items);
+      downloadPdfBytes(bytes, `anh-sang-pdf-${new Date().toISOString().slice(0,10)}.pdf`);
+      setStatus(`Hoàn tất: ${items.length} ảnh → 1 PDF (${fmt(bytes.byteLength)}).`);
+    } catch (err) {
+      console.error(err);
+      setStatus('Không thể tạo PDF. Chi tiết: ' + (err?.message || String(err)), true);
+    } finally {
+      busy = false; syncButton();
+    }
+  }
+
+  async function openMultiImagePicker() {
+    if (window.showOpenFilePicker && window.isSecureContext) {
+      try {
+        const handles = await window.showOpenFilePicker({
+          multiple: true,
+          types: [{ description: 'Ảnh', accept: { 'image/jpeg': ['.jpg', '.jpeg'], 'image/png': ['.png'], 'image/webp': ['.webp'] } }]
+        });
+        const files = [];
+        for (const handle of handles) files.push(await handle.getFile());
+        addFiles(files);
+        return;
+      } catch (err) {
+        if (err?.name === 'AbortError') return;
+        console.warn('showOpenFilePicker fallback:', err);
+      }
+    }
+    input.multiple = true;
+    input.click();
+  }
+
+  function applyCurrentCorners() {
+    if (editor.index < 0) return;
+    if (editor.points.length !== 4 || !validCorners(editor.points, editor.sourceCanvas.width, editor.sourceCanvas.height)) {
+      setCornerState('Cần đủ 4 góc hợp lệ để áp dụng.', true);
+      return;
+    }
+    items[editor.index].correction = {
+      method: editor.lastDetectionMode === 'auto' ? 'auto' : 'manual',
+      corners: normalizeCorners(orderCorners(editor.points), editor.sourceCanvas.width, editor.sourceCanvas.height)
+    };
+    renderList();
+    setStatus(`Đã lưu cân 4 góc cho ảnh: ${items[editor.index].file.name}`);
+    closeCornerEditor();
+  }
+
+  function clearCurrentCorrection() {
+    if (editor.index < 0) return;
+    items[editor.index].correction = null;
+    renderList();
+    setStatus(`Đã bỏ cân 4 góc cho ảnh: ${items[editor.index].file.name}`);
+    closeCornerEditor();
+  }
+
+  chooseBtn.addEventListener('click', e => { e.stopPropagation(); openMultiImagePicker(); });
+  dropzone.addEventListener('click', e => {
+    if (e.target.closest('.imgpdf-item') || e.target.closest('.choose-btn')) return;
+    openMultiImagePicker();
+  });
+  dropzone.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openMultiImagePicker(); }
+  });
+  input.addEventListener('change', () => { addFiles(input.files); input.value = ''; });
+  ['dragenter', 'dragover'].forEach(name => dropzone.addEventListener(name, e => {
+    e.preventDefault(); e.stopPropagation(); dropzone.classList.add('dragover');
+  }));
+  ['dragleave', 'drop'].forEach(name => dropzone.addEventListener(name, e => {
+    e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dragover');
+  }));
+  dropzone.addEventListener('drop', e => addFiles(e.dataTransfer?.files));
+  singleBtn.addEventListener('click', createSinglePdfs);
+  createBtn.addEventListener('click', createPdf);
+  window.addEventListener('beforeunload', () => items.forEach(clearItemUrl));
+
+  editorCanvas.addEventListener('pointerdown', beginDrag);
+  editorCanvas.addEventListener('pointermove', dragMove);
+  editorCanvas.addEventListener('wheel', evt => {
+    if (!editor.open || !editor.sourceCanvas) return;
+    evt.preventDefault();
+    const delta = evt.deltaY < 0 ? 1.16 : 1 / 1.16;
+    setZoom(editor.zoom * delta, getCanvasPoint(evt));
+  }, { passive: false });
+  window.addEventListener('pointerup', endDrag);
+  window.addEventListener('resize', () => { if (editor.open && editor.sourceCanvas) { resetViewport(true); renderEditor(); queuePreview(); } });
+  cornerCloseTop.addEventListener('click', closeCornerEditor);
+  cornerCancelBtn.addEventListener('click', closeCornerEditor);
+  cornerApplyBtn.addEventListener('click', applyCurrentCorners);
+  cornerResetBtn.addEventListener('click', () => {
+    editor.lastDetectionMode = 'manual';
+    editor.points = [];
+    renderEditor(); queuePreview();
+    setCornerState('Đã xóa các điểm cũ. Hãy chấm lại 4 góc theo thứ tự.');
+  });
+  cornerUndoBtn.addEventListener('click', () => {
+    if (!editor.points.length) return;
+    editor.lastDetectionMode = 'manual';
+    editor.points.pop();
+    renderEditor(); queuePreview();
+    setCornerState(editor.points.length ? `Đã xóa điểm cuối. Còn ${editor.points.length}/4 góc.` : 'Đã xóa hết điểm. Hãy chấm lại 4 góc.');
+  });
+  cornerClearBtn.addEventListener('click', clearCurrentCorrection);
+  zoomInBtn.addEventListener('click', () => { if (editor.open) setZoom(editor.zoom * 1.2); });
+  zoomOutBtn.addEventListener('click', () => { if (editor.open) setZoom(editor.zoom / 1.2); });
+  fitBtn.addEventListener('click', () => { if (editor.open && editor.sourceCanvas) { editor.zoom = 1; resetViewport(false); renderEditor(); } });
+  resetViewBtn.addEventListener('click', () => { if (editor.open && editor.sourceCanvas) { editor.zoom = 1; resetViewport(false); renderEditor(); } });
+  cornerAutoBtn.addEventListener('click', () => {
+    if (!editor.sourceCanvas) return;
+    try {
+      editor.points = autoDetectCornersFromCanvas(editor.sourceCanvas);
+      editor.lastDetectionMode = 'auto';
+      setCornerState('Đã tự nhận 4 góc. Hãy xem trước rồi bấm Áp dụng.');
+      renderEditor(); queuePreview();
+    } catch (err) {
+      setCornerState(err?.message || 'Tự nhận 4 góc chưa thành công. Bạn có thể chấm tay 4 góc.', true);
+    }
+  });
+  cornerModal.addEventListener('click', e => { if (e.target === cornerModal) closeCornerEditor(); });
+  window.addEventListener('keydown', e => { if (e.key === 'Escape' && editor.open) closeCornerEditor(); });
+  syncButton();
+})();
+
 
     // Chuyển hai chức năng tại cùng một vùng hiển thị; mặc định giữ Nén PDF.
     (() => {
