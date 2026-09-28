@@ -483,6 +483,144 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition: none !important; animation-duration: 0.001ms !important; }
     }
+
+    /* ===== BỔ SUNG ĐỘC LẬP: ẢNH → PDF (không thay đổi phần Nén PDF cũ) ===== */
+    .imgpdf-addon {
+      margin-top: 22px;
+      border-top: 1px solid var(--line);
+      padding-top: 22px;
+    }
+    .imgpdf-addon-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .imgpdf-addon-title { font-weight: 850; font-size: 1.05rem; }
+    .imgpdf-addon-desc { color: var(--muted); font-size: .88rem; line-height: 1.55; }
+    .imgpdf-toggle {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid #bfdbfe;
+      border-radius: 11px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .imgpdf-panel { display: none; margin-top: 14px; }
+    .imgpdf-panel.show { display: block; }
+    .imgpdf-dropzone {
+      border: 2px dashed #cbd5e1;
+      border-radius: 16px;
+      background: #fbfcfe;
+      padding: 22px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s ease, background .2s ease;
+      outline: none;
+    }
+    .imgpdf-dropzone:hover, .imgpdf-dropzone:focus-visible, .imgpdf-dropzone.dragover {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+    #imgPdfInput { display: none; }
+    .imgpdf-list { margin-top: 12px; display: grid; gap: 8px; }
+    .imgpdf-item {
+      display: grid;
+      grid-template-columns: 52px minmax(0,1fr) auto;
+      align-items: center;
+      gap: 10px;
+      padding: 9px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+    }
+    .imgpdf-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 9px;
+      object-fit: cover;
+      background: #f2f4f7;
+    }
+    .imgpdf-name { font-weight: 750; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .imgpdf-meta { color: var(--muted); font-size: .78rem; margin-top: 2px; }
+    .imgpdf-actions { display: flex; gap: 4px; }
+    .imgpdf-icon-btn {
+      width: 34px; height: 34px; border: 0; border-radius: 9px;
+      background: #f8fafc; color: #475467; cursor: pointer; font-weight: 800;
+    }
+    .imgpdf-icon-btn:hover { background: #eef2f7; color: var(--primary); }
+    .imgpdf-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .imgpdf-field { display: grid; gap: 6px; }
+    .imgpdf-field label { font-size: .82rem; color: var(--muted); font-weight: 700; }
+    .imgpdf-field select {
+      width: 100%; min-height: 40px; border: 1px solid var(--line); border-radius: 10px;
+      background: #fff; color: var(--text); padding: 0 10px;
+    }
+    .imgpdf-create { margin-top: 12px; }
+    .imgpdf-status { margin-top: 10px; font-size: .86rem; line-height: 1.5; color: var(--muted); }
+    @media (max-width: 560px) {
+      .imgpdf-options { grid-template-columns: 1fr; }
+      .imgpdf-item { grid-template-columns: 46px minmax(0,1fr); }
+      .imgpdf-thumb { width: 46px; height: 46px; }
+      .imgpdf-actions { grid-column: 1 / -1; justify-content: flex-end; }
+    }
+
+    /* BỔ SUNG: thanh chuyển chức năng, không thay đổi logic Nén PDF cũ */
+    .tool-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 18px 0 20px;
+    }
+    .tool-tab {
+      min-height: 46px;
+      border: 1px solid #d8e1ee;
+      border-radius: 13px;
+      background: #f8fafc;
+      color: #475467;
+      font-weight: 850;
+      cursor: pointer;
+      transition: background .18s ease, color .18s ease, border-color .18s ease, box-shadow .18s ease;
+    }
+    .tool-tab:hover { border-color: #bfdbfe; background: #eff6ff; color: #1d4ed8; }
+    .tool-tab.active {
+      border-color: var(--primary);
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, .16);
+    }
+    .tool-panel { display: none; }
+    .tool-panel.active { display: block; }
+    .imgpdf-addon { margin-top: 0; border-top: 0; padding-top: 0; }
+    .imgpdf-addon-head { display: none; }
+    .imgpdf-panel { display: block; margin-top: 0; }
+    .imgpdf-list { max-height: 250px; overflow: auto; padding-right: 2px; }
+    .imgpdf-export-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .imgpdf-export-actions .compress-btn { margin-top: 0; }
+    .imgpdf-export-actions .secondary-export {
+      background: #0f766e;
+      box-shadow: 0 8px 20px rgba(15, 118, 110, .18);
+    }
+    .imgpdf-export-actions .secondary-export:hover { background: #115e59; }
+    @media (max-width: 560px) {
+      .tool-tabs, .imgpdf-export-actions { grid-template-columns: 1fr 1fr; gap: 8px; }
+      .tool-tab { min-height: 44px; font-size: .92rem; }
+    }
+
   </style>
 </head>
 <body>
@@ -502,6 +640,12 @@
         </div>
       </div>
 
+      <div class="tool-tabs" role="tablist" aria-label="Chọn chức năng PDF">
+        <button id="compressTab" class="tool-tab active" type="button" role="tab" aria-selected="true" aria-controls="compressPanel">Nén PDF</button>
+        <button id="imagePdfTab" class="tool-tab" type="button" role="tab" aria-selected="false" aria-controls="imagePdfPanel">Ảnh → PDF</button>
+      </div>
+
+      <div id="compressPanel" class="tool-panel active" role="tabpanel" aria-labelledby="compressTab">
       <p class="subtitle">
         Chọn một file PDF, điều chỉnh mức nén và tải xuống bản tối ưu. Toàn bộ nội dung PDF được xử lý ngay trên thiết bị của bạn.
       </p>
@@ -584,6 +728,48 @@
       <p class="note">
         <strong>Lưu ý:</strong> chế độ nén này chuyển từng trang sang ảnh JPEG tối ưu rồi tạo lại PDF, vì vậy có thể làm mất khả năng chọn văn bản, hyperlink, form và một số thành phần tương tác. V7 ưu tiên tốc độ và RAM thấp bằng cơ chế 1 lượt, đọc file qua Blob URL và tái sử dụng một Canvas. Dung lượng thực tế có thể lệch so với ước tính tùy nội dung từng PDF. File PDF không được gửi lên server; trình duyệt chỉ tải thư viện JavaScript từ CDN.
       </p>
+      </div>
+
+      <!-- BỔ SUNG ĐỘC LẬP: ẢNH → PDF. Chỉ hiển thị khi chọn tab Ảnh → PDF. -->
+      <div id="imagePdfPanel" class="tool-panel" role="tabpanel" aria-labelledby="imagePdfTab">
+      <div class="imgpdf-addon" id="imgPdfAddon">
+        <div id="imgPdfPanel" class="imgpdf-panel">
+          <div id="imgPdfDropzone" class="imgpdf-dropzone" tabindex="0" role="button" aria-label="Chọn hoặc kéo thả ảnh">
+            <div class="drop-title">Kéo & thả ảnh vào đây</div>
+            <div class="drop-help">JPG, JPEG, PNG, WEBP · có thể chọn nhiều ảnh cùng lúc</div>
+            <button id="imgPdfChooseBtn" class="choose-btn" type="button">Chọn ảnh</button>
+            <input id="imgPdfInput" type="file" accept="image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp" multiple />
+          </div>
+
+          <div id="imgPdfList" class="imgpdf-list" aria-live="polite"></div>
+
+          <div class="imgpdf-options">
+            <div class="imgpdf-field">
+              <label for="imgPdfPageSize">Khổ trang</label>
+              <select id="imgPdfPageSize">
+                <option value="a4">A4 · tự xoay theo ảnh</option>
+                <option value="image">Theo kích thước ảnh</option>
+              </select>
+            </div>
+            <div class="imgpdf-field">
+              <label for="imgPdfMargin">Lề trang</label>
+              <select id="imgPdfMargin">
+                <option value="24">Vừa</option>
+                <option value="12">Nhỏ</option>
+                <option value="0">Không lề</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="imgpdf-export-actions">
+            <button id="imgPdfSingleBtn" class="compress-btn secondary-export" type="button" disabled>Xuất từng file PDF</button>
+            <button id="imgPdfCreateBtn" class="compress-btn" type="button" disabled>Xuất gộp PDF</button>
+          </div>
+          <div id="imgPdfStatus" class="imgpdf-status"></div>
+        </div>
+      </div>
+      </div>
+
     </section>
   </main>
 
@@ -1219,5 +1405,278 @@
     updateRangeFill();
     updateUltraFill();
   </script>
+
+  <script>
+    // ===== BỔ SUNG ĐỘC LẬP: ẢNH → PDF =====
+    (() => {
+      const panel = document.getElementById('imgPdfPanel');
+      const singleBtn = document.getElementById('imgPdfSingleBtn');
+      const dropzone = document.getElementById('imgPdfDropzone');
+      const chooseBtn = document.getElementById('imgPdfChooseBtn');
+      const input = document.getElementById('imgPdfInput');
+      const list = document.getElementById('imgPdfList');
+      const createBtn = document.getElementById('imgPdfCreateBtn');
+      const status = document.getElementById('imgPdfStatus');
+      const pageSize = document.getElementById('imgPdfPageSize');
+      const margin = document.getElementById('imgPdfMargin');
+
+      let items = [];
+      let busy = false;
+      const ACCEPTED = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+      const fmt = bytes => {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / 1024 / 1024).toFixed(2) + ' MB';
+      };
+
+      function setStatus(text, isError = false) {
+        status.textContent = text || '';
+        status.style.color = isError ? 'var(--danger)' : 'var(--muted)';
+      }
+
+      function syncButton() {
+        const disabled = busy || items.length === 0;
+        createBtn.disabled = disabled;
+        singleBtn.disabled = disabled;
+      }
+
+      function clearItemUrl(item) {
+        if (item.url) URL.revokeObjectURL(item.url);
+      }
+
+      function renderList() {
+        list.replaceChildren();
+        items.forEach((item, index) => {
+          const row = document.createElement('div');
+          row.className = 'imgpdf-item';
+
+          const img = document.createElement('img');
+          img.className = 'imgpdf-thumb';
+          img.src = item.url;
+          img.alt = '';
+          img.style.transform = `rotate(${item.rotation}deg)`;
+
+          const info = document.createElement('div');
+          const name = document.createElement('div');
+          name.className = 'imgpdf-name';
+          name.textContent = item.file.name;
+          const meta = document.createElement('div');
+          meta.className = 'imgpdf-meta';
+          meta.textContent = `${fmt(item.file.size)} · ${index + 1}/${items.length}`;
+          info.append(name, meta);
+
+          const actions = document.createElement('div');
+          actions.className = 'imgpdf-actions';
+          const defs = [
+            ['↑', 'Đưa lên', () => move(index, -1)],
+            ['↓', 'Đưa xuống', () => move(index, 1)],
+            ['↻', 'Xoay 90°', () => rotate(index)],
+            ['✕', 'Xóa ảnh', () => remove(index)]
+          ];
+          defs.forEach(([txt, title, fn]) => {
+            const b = document.createElement('button');
+            b.type = 'button'; b.className = 'imgpdf-icon-btn'; b.textContent = txt; b.title = title;
+            b.addEventListener('click', fn); actions.appendChild(b);
+          });
+
+          row.append(img, info, actions);
+          list.appendChild(row);
+        });
+        syncButton();
+      }
+
+      function move(index, delta) {
+        const next = index + delta;
+        if (next < 0 || next >= items.length) return;
+        [items[index], items[next]] = [items[next], items[index]];
+        renderList();
+      }
+
+      function rotate(index) {
+        items[index].rotation = (items[index].rotation + 90) % 360;
+        renderList();
+      }
+
+      function remove(index) {
+        const [removed] = items.splice(index, 1);
+        clearItemUrl(removed);
+        renderList();
+        setStatus(items.length ? `Đã chọn ${items.length} ảnh.` : '');
+      }
+
+      function addFiles(fileList) {
+        const files = Array.from(fileList || []).filter(f => ACCEPTED.has(f.type) || /\.(jpe?g|png|webp)$/i.test(f.name));
+        if (!files.length) {
+          setStatus('Không có ảnh JPG, JPEG, PNG hoặc WEBP hợp lệ.', true);
+          return;
+        }
+        files.forEach(file => items.push({ file, rotation: 0, url: URL.createObjectURL(file) }));
+        renderList();
+        setStatus(`Đã chọn ${items.length} ảnh. Thứ tự trong danh sách cũng là thứ tự trang PDF.`);
+      }
+
+      function loadImage(file) {
+        return new Promise((resolve, reject) => {
+          const url = URL.createObjectURL(file);
+          const img = new Image();
+          img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+          img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Không đọc được ảnh: ' + file.name)); };
+          img.src = url;
+        });
+      }
+
+      async function imageToJpegBytes(item) {
+        const img = await loadImage(item.file);
+        const swap = item.rotation === 90 || item.rotation === 270;
+        const w = swap ? img.naturalHeight : img.naturalWidth;
+        const h = swap ? img.naturalWidth : img.naturalHeight;
+        if (!w || !h) throw new Error('Ảnh không có kích thước hợp lệ: ' + item.file.name);
+
+        const maxSide = 6000;
+        const scale = Math.min(1, maxSide / Math.max(w, h));
+        const outW = Math.max(1, Math.round(w * scale));
+        const outH = Math.max(1, Math.round(h * scale));
+        const canvas = document.createElement('canvas');
+        canvas.width = outW; canvas.height = outH;
+        const ctx = canvas.getContext('2d', { alpha: false });
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, outW, outH);
+        ctx.save();
+        ctx.translate(outW / 2, outH / 2);
+        ctx.rotate(item.rotation * Math.PI / 180);
+        const drawW = swap ? outH : outW;
+        const drawH = swap ? outW : outH;
+        ctx.drawImage(img, -drawW / 2, -drawH / 2, drawW, drawH);
+        ctx.restore();
+
+        const blob = await new Promise((resolve, reject) => canvas.toBlob(b => b ? resolve(b) : reject(new Error('Không chuyển được ảnh.')), 'image/jpeg', 0.94));
+        return { bytes: new Uint8Array(await blob.arrayBuffer()), width: outW, height: outH };
+      }
+
+      function safePdfName(name) {
+        const base = (name || 'anh').replace(/\.[^.]+$/, '').trim() || 'anh';
+        return base.replace(/[\\/:*?"<>|]+/g, '_') + '.pdf';
+      }
+
+      async function buildPdfFromItems(sourceItems) {
+        const pdf = await window.PDFLib.PDFDocument.create();
+        const A4_PORTRAIT = [595.28, 841.89];
+        const m = Number(margin.value) || 0;
+
+        for (let i = 0; i < sourceItems.length; i++) {
+          const converted = await imageToJpegBytes(sourceItems[i]);
+          const embedded = await pdf.embedJpg(converted.bytes);
+          let pw, ph;
+          if (pageSize.value === 'image') {
+            pw = Math.max(72, Math.min(14400, converted.width * 0.75));
+            ph = Math.max(72, Math.min(14400, converted.height * 0.75));
+          } else {
+            const landscape = converted.width > converted.height;
+            [pw, ph] = landscape ? [A4_PORTRAIT[1], A4_PORTRAIT[0]] : A4_PORTRAIT;
+          }
+          const page = pdf.addPage([pw, ph]);
+          const availW = Math.max(1, pw - m * 2);
+          const availH = Math.max(1, ph - m * 2);
+          const scale = Math.min(availW / converted.width, availH / converted.height);
+          const drawW = converted.width * scale;
+          const drawH = converted.height * scale;
+          page.drawImage(embedded, {
+            x: (pw - drawW) / 2, y: (ph - drawH) / 2, width: drawW, height: drawH
+          });
+        }
+        return pdf.save({ useObjectStreams: true });
+      }
+
+      function downloadPdfBytes(bytes, filename) {
+        const blob = new Blob([bytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+      }
+
+      async function createSinglePdfs() {
+        if (busy || !items.length) return;
+        if (!window.PDFLib?.PDFDocument) {
+          setStatus('Thư viện PDF chưa tải xong. Hãy kiểm tra Internet rồi thử lại.', true);
+          return;
+        }
+        busy = true; syncButton();
+        try {
+          for (let i = 0; i < items.length; i++) {
+            setStatus(`Đang xuất file ${i + 1}/${items.length}: ${items[i].file.name}`);
+            const bytes = await buildPdfFromItems([items[i]]);
+            downloadPdfBytes(bytes, safePdfName(items[i].file.name));
+          }
+          setStatus(`Hoàn tất: đã xuất ${items.length} file PDF riêng. Nếu trình duyệt hỏi, hãy cho phép tải nhiều file.`);
+        } catch (err) {
+          console.error(err);
+          setStatus('Không thể xuất PDF riêng. Chi tiết: ' + (err?.message || String(err)), true);
+        } finally {
+          busy = false; syncButton();
+        }
+      }
+
+      async function createPdf() {
+        if (busy || !items.length) return;
+        if (!window.PDFLib?.PDFDocument) {
+          setStatus('Thư viện PDF chưa tải xong. Hãy kiểm tra Internet rồi thử lại.', true);
+          return;
+        }
+        busy = true; syncButton(); setStatus('Đang tạo PDF…');
+        try {
+          for (let i = 0; i < items.length; i++) {
+            setStatus(`Đang xử lý ảnh ${i + 1}/${items.length}: ${items[i].file.name}`);
+          }
+          const bytes = await buildPdfFromItems(items);
+          downloadPdfBytes(bytes, `anh-sang-pdf-${new Date().toISOString().slice(0,10)}.pdf`);
+          setStatus(`Hoàn tất: ${items.length} ảnh → 1 PDF (${fmt(bytes.byteLength)}).`);
+        } catch (err) {
+          console.error(err);
+          setStatus('Không thể tạo PDF. Chi tiết: ' + (err?.message || String(err)), true);
+        } finally {
+          busy = false; syncButton();
+        }
+      }
+
+      chooseBtn.addEventListener('click', e => { e.stopPropagation(); input.click(); });
+      dropzone.addEventListener('click', () => input.click());
+      dropzone.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+      });
+      input.addEventListener('change', () => { addFiles(input.files); input.value = ''; });
+      ['dragenter','dragover'].forEach(name => dropzone.addEventListener(name, e => {
+        e.preventDefault(); e.stopPropagation(); dropzone.classList.add('dragover');
+      }));
+      ['dragleave','drop'].forEach(name => dropzone.addEventListener(name, e => {
+        e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dragover');
+      }));
+      dropzone.addEventListener('drop', e => addFiles(e.dataTransfer?.files));
+      singleBtn.addEventListener('click', createSinglePdfs);
+      createBtn.addEventListener('click', createPdf);
+      window.addEventListener('beforeunload', () => items.forEach(clearItemUrl));
+    })();
+
+    // Chuyển hai chức năng tại cùng một vùng hiển thị; mặc định giữ Nén PDF.
+    (() => {
+      const compressTab = document.getElementById('compressTab');
+      const imagePdfTab = document.getElementById('imagePdfTab');
+      const compressPanel = document.getElementById('compressPanel');
+      const imagePdfPanel = document.getElementById('imagePdfPanel');
+      function show(mode) {
+        const imageMode = mode === 'image';
+        compressTab.classList.toggle('active', !imageMode);
+        imagePdfTab.classList.toggle('active', imageMode);
+        compressPanel.classList.toggle('active', !imageMode);
+        imagePdfPanel.classList.toggle('active', imageMode);
+        compressTab.setAttribute('aria-selected', String(!imageMode));
+        imagePdfTab.setAttribute('aria-selected', String(imageMode));
+      }
+      compressTab.addEventListener('click', () => show('compress'));
+      imagePdfTab.addEventListener('click', () => show('image'));
+    })();
+  </script>
+
 </body>
 </html>
